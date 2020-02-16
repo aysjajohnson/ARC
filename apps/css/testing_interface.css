@@ -117,7 +117,7 @@ input, button {
 /*Task demonstration*/
 
 .pair_preview {
-    height: 200px;
+    height: 250px;
     padding: 5px;
     border-bottom: solid 1px #a1a1a1;
 }
@@ -133,12 +133,32 @@ input, button {
     margin-left: 35px;
 }
 
+.preview_block {
+   height: 200px;
+   width: 200px;
+   float: left; 
+}
+
 .text {
     text-align: center;
     background: white;
     padding-top: 5px;
     padding-bottom: 5px;
     margin-bottom: 10px;
+}
+
+.subTextLeft {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.subTextRight {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    float: right;
+    margin-right: 35px;
 }
 
 #task_demo_header {
@@ -166,4 +186,9 @@ input, button {
 
 #modal input {
     margin-left: 70px;
+}
+
+br {
+   display: block;
+   margin: 10px 0;
 }

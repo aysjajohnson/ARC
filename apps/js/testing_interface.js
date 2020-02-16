@@ -5,12 +5,34 @@ var CURRENT_OUTPUT_GRID = new Grid(3, 3);
 var TEST_PAIRS = new Array();
 var CURRENT_TEST_PAIR_INDEX = 0;
 var COPY_PASTE_DATA = new Array();
+var taskList = new Array();
+// creating a list of tasks in order to tell where we are
+$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+    taskList.push(tasks);
+});
+// creating a variable task to keep track of what the last task was
+var prevTask = "None";
+var numAttempts = 0;
 
 // Cosmetic.
 var EDITION_GRID_HEIGHT = 500;
 var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
+// Text helpers
+
+function help() {
+    alert('The left side is the input, the right side is the output');
+    var msg = "Instructions"
+    $('#error_display').stop(true, true);
+    $('#info_display').stop(true, true);
+
+    $('#error_display').hide();
+    $('#info_display').hide();
+    $('#help_text').html(msg);
+    $('#help_text').show();
+    $('#help_text').fadeOut(5000);
+}
 
 function resetTask() {
     CURRENT_INPUT_GRID = new Grid(3, 3);
@@ -61,10 +83,13 @@ function setUpEditionGridListeners(jqGrid) {
 }
 
 function resizeOutputGrid() {
-    size = $('#output_grid_size').val();
-    size = parseSizeTuple(size);
-    height = size[0];
-    width = size[1];
+    // size = $('#output_grid_size').val();
+    size = $('#height').val();
+    // size = parseSizeTuple(size);
+    // height = size[0];
+    // width = size[1];
+    height = $('#height').val();
+    width = $('#width').val();
 
     jqGrid = $('#output_grid .edition_grid');
     syncFromEditionGridToDataGrid();
@@ -84,7 +109,9 @@ function copyFromInput() {
     syncFromEditionGridToDataGrid();
     CURRENT_OUTPUT_GRID = convertSerializedGridToGridObject(CURRENT_INPUT_GRID.grid);
     syncFromDataGridToEditionGrid();
-    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
+    // changing this code
+    // $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
+    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height, CURRENT_OUTPUT_GRID.width);
 }
 
 function fillPairPreview(pairId, inputGrid, outputGrid) {
@@ -97,12 +124,22 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     var jqInputGrid = pairSlot.find('.input_preview');
     if (!jqInputGrid.length) {
         jqInputGrid = $('<div class="input_preview"></div>');
-        jqInputGrid.appendTo(pairSlot);
+        // Adding a header to each input/ouput pair in demonstration
+        var name = $('<div class="subTextLeft" id="task_header">Input ' + (pairId+1) + '</div>');
+        var leftGrid = $('<div id = "left_block_' + pairId + '" class="preview_block"></div>');
+        leftGrid.appendTo(pairSlot)
+        name.appendTo(leftGrid);
+        jqInputGrid.appendTo(leftGrid);
     }
     var jqOutputGrid = pairSlot.find('.output_preview');
     if (!jqOutputGrid.length) {
         jqOutputGrid = $('<div class="output_preview"></div>');
-        jqOutputGrid.appendTo(pairSlot);
+        // jqOutputGrid.appendTo(pairSlot);
+        var name = $('<div class="subTextRight" id="task_header">Output ' + (pairId+1) + '</div>');
+        var rightGrid = $('<div id = "right_block_' + pairId + '" class="preview_block"></div>');
+        rightGrid.appendTo(pairSlot)
+        name.appendTo(rightGrid);
+        jqOutputGrid.appendTo(rightGrid);
     }
 
     fillJqGridWithData(jqInputGrid, inputGrid);
@@ -143,6 +180,7 @@ function loadTaskFromFile(e) {
         errorMsg('No file selected');
         return;
     }
+    window.prevTask = file["name"];
     var reader = new FileReader();
     reader.onload = function(e) {
         var contents = e.target.result;
@@ -160,25 +198,96 @@ function loadTaskFromFile(e) {
     reader.readAsText(file);
 }
 
+// Helper functions for loading different tasks
+
+function findTask() {
+   for (i = 0; i < taskList[0].length; i++) {
+        if (taskList[0][i]["name"] == prevTask) {
+            return i;
+        };
+    };   
+}
+
+function move(tasks, step) {
+  index = findTask()
+  if (index == 0 && step == -1) {
+    errorMsg("No previous grids")
+  } 
+  if (index + 1 == tasks.length && step == 1) {
+    errorMsg("No more grids")
+  }
+  else {
+    var taskNum = index + step;
+    var task = tasks[taskNum];
+    window.prevTask = task["name"];
+    window.numAttempts = 0;
+    displayNumAttempts(numAttempts);
+    return task;
+  }
+}
+
+function verify(task) {
+  $.getJSON(task["download_url"], function(json) {
+      try {
+          train = json['train'];
+          test = json['test'];
+      } catch (e) {
+          errorMsg('Bad file format');
+          return;
+      }
+      loadJSONTask(train, test);
+      $('#load_task_file_input')[0].value = "";
+      infoMsg("Loaded task training/" + task["name"]);
+  })
+  .error(function(){
+    errorMsg('Error loading task');
+  });
+}
+
+// Loading first, next, previous, and random tasks
+
+function firstTask() {
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
+      var task = tasks[0];
+      window.prevTask = task["name"];
+      verify(task);
+    })
+    .error(function(){
+      errorMsg('Error loading task list');
+    });
+}
+
+function nextTask() {
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
+        var task = move(tasks, 1)
+        verify(task);
+    })
+    .error(function(){
+      errorMsg('Error loading task list');
+    });
+}
+
+function previousTask() {
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {  
+      var task = move(tasks,-1)
+      verify(task)
+    })
+    .error(function(){
+      errorMsg('Error loading task list');
+    });
+}
+
 function randomTask() {
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
       var task = tasks[Math.floor(Math.random() * tasks.length)];
-      $.getJSON(task["download_url"], function(json) {
-          try {
-              train = json['train'];
-              test = json['test'];
-          } catch (e) {
-              errorMsg('Bad file format');
-              return;
-          }
-          loadJSONTask(train, test);
-          $('#load_task_file_input')[0].value = "";
-          infoMsg("Loaded task training/" + task["name"]);
-      })
-      .error(function(){
-        errorMsg('Error loading task');
-      });
+      prevTask = task["name"];
+      window.numAttempts = 0;
+      displayNumAttempts(numAttempts);
+      verify(task);
     })
     .error(function(){
       errorMsg('Error loading task list');
@@ -198,12 +307,33 @@ function nextTestInput() {
     $('#total_test_input_count_display').html(test.length);
 }
 
+function displayNumAttempts(n) {
+  // var nAttempts = $('#evaluation_output_editor');
+  var nAttempts = $('#num_attempts');
+  if (!nAttempts.length) {
+    console.log("here")
+    nAttempts = $('<div id="num_attempts">Number of attempts: 1</div>');
+    nAttempts.appendTo('#evaluation_output_editor')
+  }
+  // pairSlot = $('<div id="pair_preview_' + pairId + '" class="pair_preview" index="' + pairId + '"></div>');
+  // console.log(`<div id="num_attempts">Number of attempts: ${n}</div>`)
+  else {
+    nAttempts.html(`Number of attempts: ${n}`);
+  }
+  // = $('#num_attempts').html(`Number of attempts: ${n}`)
+  // var nAttempts = $('<div id="num_attempts">Number of attempts: </div>');
+  // nAttempts.appendTo('#evaluation_output_editor');
+
+}
+
 function submitSolution() {
     syncFromEditionGridToDataGrid();
     reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
     submitted_output = CURRENT_OUTPUT_GRID.grid;
     if (reference_output.length != submitted_output.length) {
         errorMsg('Wrong solution.');
+        numAttempts ++;
+        displayNumAttempts(numAttempts);
         return
     }
     for (var i = 0; i < reference_output.length; i++){
@@ -211,11 +341,15 @@ function submitSolution() {
         for (var j = 0; j < ref_row.length; j++){
             if (ref_row[j] != submitted_output[i][j]) {
                 errorMsg('Wrong solution.');
+                numAttempts ++;
+                displayNumAttempts(numAttempts);
                 return
             }
         }
 
     }
+    numAttempts++;
+    displayNumAttempts(numAttempts);
     infoMsg('Correct solution!');
 }
 
@@ -229,7 +363,9 @@ function copyToOutput() {
     syncFromEditionGridToDataGrid();
     CURRENT_OUTPUT_GRID = convertSerializedGridToGridObject(CURRENT_INPUT_GRID.grid);
     syncFromDataGridToEditionGrid();
-    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
+    // changing code here
+    // $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
+    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height,CURRENT_OUTPUT_GRID.width);
 }
 
 function initializeSelectable() {

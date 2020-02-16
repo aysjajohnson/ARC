@@ -21,6 +21,7 @@
                 <div>Welcome to the ARC testing interface. <br /> Choose a task file to start, or click on "Random task" to load one from the ARC project on github.</div>
                 <br />
                 <input type="file" class="load_task"/>
+                <button onclick="firstTask()" id="random_task_btn">First task</button>
                 <button onclick="randomTask()" id="random_task_btn">Random task</button>
             </div>
         </div>
@@ -28,6 +29,7 @@
 
             <div id="demonstration_examples_view">
                 <div class="text" id="task_demo_header">Task demonstration</div>
+                  <!-- <button onclick="help()" id="help">Instructions</button></div> -->
                 <div id="task_preview"></div>
             </div>
 
@@ -39,6 +41,8 @@
                     </div>
 
                     <div id="evaluation_input" class="selectable_grid"></div>
+                    <!-- <button onclick="help()" id="help_text">Instructions</button></div> -->
+                    <!-- <div id="help_text"></div> -->
                 </div>
 
                 <div id="evaluation_output_editor">
@@ -46,6 +50,9 @@
                     <div id="load_task_control_btns">
                         <label for="load_task_file_input">Load task JSON: </label>
                         <input type="file" id="load_task_file_input" class="load_task"/>
+                        <br></br>
+                        <button onclick="previousTask()" id="prev_task_btn">Previous task</button>
+                        <button onclick="nextTask()" id="next_task_btn">Next task</button>
                         <button onclick="randomTask()" id="random_task_btn">Random task</button>
                     </div>
 
@@ -53,7 +60,60 @@
                         <div id="editor_grid_control_btns">
                             <div id="resize_control_btns">
                                 <label for="output_grid_size">Change grid size: </label>
-                                <input type="text" id="output_grid_size" class="grid_size_field" name="size" value="3x3">
+                                <label for="height">Height:</label>
+                                    <select id="height">
+                                      <option value="1">1</option>
+                                      <option value="2">2</option>
+                                      <option value="3"Selected>3</option>
+                                      <option value="4">4</option>
+                                      <option value="5">5</option>
+                                      <option value="6">6</option>
+                                      <option value="7">7</option>
+                                      <option value="8">8</option>
+                                      <option value="9">9</option>
+                                      <option value="10">10</option>
+                                      <option value="11">11</option>
+                                      <option value="12">12</option>
+                                      <option value="13">13</option>
+                                      <option value="14">14</option>
+                                      <option value="15">15</option>
+                                      <option value="16">16</option>
+                                      <option value="17">17</option>
+                                      <option value="18">18</option>
+                                      <option value="19">19</option>
+                                      <option value="20">20</option>
+                                      <option value="22">21</option>
+                                      <option value="23">23</option>
+                                      <option value="24">24</option>
+                                      <option value="25">25</option>
+                                    </select>
+                                <label for="width">Width:</label>
+                                    <select id="width">
+                                      <option value="1">1</option>
+                                      <option value="2">2</option>
+                                      <option value="3"Selected>3</option>
+                                      <option value="4">4</option>
+                                      <option value="5">5</option>
+                                      <option value="6">6</option>
+                                      <option value="7">7</option>
+                                      <option value="8">8</option>
+                                      <option value="9">9</option>
+                                      <option value="10">10</option>
+                                      <option value="11">11</option>
+                                      <option value="12">12</option>
+                                      <option value="13">13</option>
+                                      <option value="14">14</option>
+                                      <option value="15">15</option>
+                                      <option value="16">16</option>
+                                      <option value="17">17</option>
+                                      <option value="18">18</option>
+                                      <option value="19">19</option>
+                                      <option value="20">20</option>
+                                      <option value="22">21</option>
+                                      <option value="23">23</option>
+                                      <option value="24">24</option>
+                                      <option value="25">25</option>
+                                    </select>
                                 <button onclick="resizeOutputGrid()" id="resize_btn">Resize</button>
                             </div>
 
@@ -113,8 +173,11 @@
                         </div>
                     </div>
 
+                    <div id="num_attempts">Number of attempts: 0</div>
+
                     <div id="error_display"></div>
                     <div id="info_display"></div>
+
                 </div>
             </div>
         </div>
