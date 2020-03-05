@@ -238,6 +238,7 @@ function verify(task) {
       loadJSONTask(train, test);
       $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
+      $('#current_task').text('Current task: '+ task["name"]);
   })
   .error(function(){
     errorMsg('Error loading task');
