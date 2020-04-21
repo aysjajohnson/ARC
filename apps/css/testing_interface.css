@@ -1,10 +1,10 @@
 body {
     font-family: 'Open Sans', sans-serif;
-    min-width: 1410px;
+    min-width: 1430px;
 }
 
 #workspace {
-    width: 1410px;
+    width: 1430px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -19,7 +19,7 @@ body {
 
 #evaluation_view {
     float: left;
-    width: 930px;
+    width: 950px;
     margin: 10px;
     margin-left: 5px;
     background-color: #d5d5d5;
@@ -35,7 +35,8 @@ body {
 #evaluation_output_editor {
     float: left;
     width: 500px;
-    margin-bottom: 20px;
+    margin: 10px;
+    margin-bottom: 10px;
 }
 
 #load_task_control_btns {
@@ -83,16 +84,18 @@ button:focus {outline:0;}
 
 #toolbar {
     float: left;
-    margin-left: 10px;
-    margin-top: 18px;
+    /* background: white; */
+    /* margin-left: 10px; */
+    /* margin-top: 10px; */
     margin-bottom: 10px;
     width: 100%;
-
 }
 
 #symbol_picker {
     float: left;
-    margin-left: 20px;
+    /* background: white; */
+    margin-left: 10px;
+    margin-bottom: 20px;
     width: 100%;
 }
 
@@ -149,16 +152,18 @@ input, button {
 
 .subTextLeft {
     text-align: center;
+    /* background: white; */
     padding-top: 5px;
     padding-bottom: 5px;
 }
 
 .subTextRight {
     text-align: center;
+    /* background: white; */
     padding-top: 5px;
     padding-bottom: 5px;
     float: right;
-    margin-right: 35px;
+    margin-right: 10px;
 }
 
 #task_demo_header {

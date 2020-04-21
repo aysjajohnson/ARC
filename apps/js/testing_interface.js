@@ -1,4 +1,3 @@
-
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
 var CURRENT_OUTPUT_GRID = new Grid(3, 3);
@@ -125,7 +124,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqInputGrid.length) {
         jqInputGrid = $('<div class="input_preview"></div>');
         // Adding a header to each input/ouput pair in demonstration
-        var name = $('<div class="subTextLeft" id="task_header">Input ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextLeft" id="task_header">Train Input ' + (pairId+1) + '</div>');
         var leftGrid = $('<div id = "left_block_' + pairId + '" class="preview_block"></div>');
         leftGrid.appendTo(pairSlot)
         name.appendTo(leftGrid);
@@ -135,7 +134,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqOutputGrid.length) {
         jqOutputGrid = $('<div class="output_preview"></div>');
         // jqOutputGrid.appendTo(pairSlot);
-        var name = $('<div class="subTextRight" id="task_header">Output ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextRight" id="task_header">Train Output ' + (pairId+1) + '</div>');
         var rightGrid = $('<div id = "right_block_' + pairId + '" class="preview_block"></div>');
         rightGrid.appendTo(pairSlot)
         name.appendTo(rightGrid);
@@ -221,7 +220,7 @@ function move(tasks, step) {
     var task = tasks[taskNum];
     window.prevTask = task["name"];
     window.numAttempts = 0;
-    displayNumAttempts(numAttempts);
+    // displayNumAttempts(numAttempts);
     return task;
   }
 }
@@ -238,7 +237,8 @@ function verify(task) {
       loadJSONTask(train, test);
       $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
-      $('#current_task').text('Current task: '+ task["name"]);
+      index = findTask()
+      $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
   })
   .error(function(){
     errorMsg('Error loading task');
@@ -249,8 +249,10 @@ function verify(task) {
 
 function firstTask() {
     var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+    function(tasks) {
       var task = tasks[0];
+      var task_index = 0;
       window.prevTask = task["name"];
       verify(task);
     })
@@ -261,7 +263,8 @@ function firstTask() {
 
 function nextTask() {
     var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
+        function(tasks) {
         var task = move(tasks, 1)
         verify(task);
     })
@@ -272,7 +275,8 @@ function nextTask() {
 
 function previousTask() {
     var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {  
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+              function(tasks) {  
       var task = move(tasks,-1)
       verify(task)
     })
@@ -283,11 +287,12 @@ function previousTask() {
 
 function randomTask() {
     var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, function(tasks) {
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,  
+              function(tasks) {
       var task = tasks[Math.floor(Math.random() * tasks.length)];
       prevTask = task["name"];
       window.numAttempts = 0;
-      displayNumAttempts(numAttempts);
+      // displayNumAttempts(numAttempts);
       verify(task);
     })
     .error(function(){
@@ -334,7 +339,7 @@ function submitSolution() {
     if (reference_output.length != submitted_output.length) {
         errorMsg('Wrong solution.');
         numAttempts ++;
-        displayNumAttempts(numAttempts);
+        // displayNumAttempts(numAttempts);
         return
     }
     for (var i = 0; i < reference_output.length; i++){
@@ -343,14 +348,14 @@ function submitSolution() {
             if (ref_row[j] != submitted_output[i][j]) {
                 errorMsg('Wrong solution.');
                 numAttempts ++;
-                displayNumAttempts(numAttempts);
+                // displayNumAttempts(numAttempts);
                 return
             }
         }
 
     }
     numAttempts++;
-    displayNumAttempts(numAttempts);
+    // displayNumAttempts(numAttempts);
     infoMsg('Correct solution!');
 }
 
