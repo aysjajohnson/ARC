@@ -1,5 +1,5 @@
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Verdana', sans-serif;
     min-width: 1430px;
 }
 
@@ -57,6 +57,7 @@ body {
     width: 100%;
     padding-top: 5px;
     padding-bottom: 5px;
+    border-radius: 4px;
 }
 
 #resize_control_btns {
@@ -105,12 +106,19 @@ button:focus {outline:0;}
     float: left;
 }
 
+label_heading {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
 label {
     margin-left: 10px;
 }
 
 input, button {
+    /* font-size: 16px; */
     margin-left: 10px;
+    /* border-radius: 2px; */
 }
 
 #resize_btn {

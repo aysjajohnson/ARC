@@ -1,3 +1,27 @@
+// this function runs when the page is loaded
+$(document).ready(function () {
+
+    // show an alert if user tries to navigate away from this page
+    // window.onbeforeunload = function() {
+    //     return "You have not completed the experiment.";
+    // };
+
+    // add things to detect if height or width are resized
+    $('#height').change(function() {
+        console.log('changing height');
+        resizeOutputGrid()
+    });
+
+    $('#width').change(function() {
+        console.log('changing width');
+        resizeOutputGrid()
+    });
+    
+    // automatically load a random task
+    randomTask();
+});
+
+
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
 var CURRENT_OUTPUT_GRID = new Grid(3, 3);
@@ -83,7 +107,7 @@ function setUpEditionGridListeners(jqGrid) {
 
 function resizeOutputGrid() {
     // size = $('#output_grid_size').val();
-    size = $('#height').val();
+    // size = $('#height').val();
     // size = parseSizeTuple(size);
     // height = size[0];
     // width = size[1];
@@ -111,6 +135,10 @@ function copyFromInput() {
     // changing this code
     // $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
     $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height, CURRENT_OUTPUT_GRID.width);
+
+    // modify grid size values
+    $('#height').val(CURRENT_OUTPUT_GRID.height);
+    $('#width').val(CURRENT_OUTPUT_GRID.width);
 }
 
 function fillPairPreview(pairId, inputGrid, outputGrid) {
@@ -235,7 +263,7 @@ function verify(task) {
           return;
       }
       loadJSONTask(train, test);
-      $('#load_task_file_input')[0].value = "";
+      // $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
       index = findTask()
       $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
