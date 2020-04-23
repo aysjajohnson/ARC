@@ -35,7 +35,13 @@ function floodfillFromLocation(grid, i, j, symbol) {
             }
         }
     }
-    flow(i, j, symbol, target);
+
+    // only apply flood fill if target cell is not the
+    // current symbol/selected colour
+    // otherwise, will cause a recursion stack error
+    if (symbol != target) {
+        flow(i, j, symbol, target);
+    }
 }
 
 function parseSizeTuple(size) {
