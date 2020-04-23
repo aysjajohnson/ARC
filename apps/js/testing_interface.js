@@ -8,12 +8,14 @@ $(document).ready(function () {
 
     // add things to detect if height or width are resized
     $('#height').change(function() {
-        console.log('changing height');
+        console.log('action: changed height of output grid to ' +
+                    $('#height').val());
         resizeOutputGrid()
     });
 
     $('#width').change(function() {
-        console.log('changing width');
+        console.log('action: changed width of output grid to ' +
+                    $('#width').val());
         resizeOutputGrid()
     });
     
@@ -27,6 +29,7 @@ var CURRENT_INPUT_GRID = new Grid(3, 3);
 var CURRENT_OUTPUT_GRID = new Grid(3, 3);
 var TEST_PAIRS = new Array();
 var CURRENT_TEST_PAIR_INDEX = 0;
+var SELECT_DATA = new Array();
 var COPY_PASTE_DATA = new Array();
 var taskList = new Array();
 // creating a list of tasks in order to tell where we are
@@ -97,10 +100,16 @@ function setUpEditionGridListeners(jqGrid) {
             grid = CURRENT_OUTPUT_GRID.grid;
             floodfillFromLocation(grid, cell.attr('x'), cell.attr('y'), symbol);
             syncFromDataGridToEditionGrid();
+
+            // TODO: save action
+            console.log('action: flood fill at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
         }
         else if (mode == 'edit') {
             // Else: fill just this cell.
             setCellSymbol(cell, symbol);
+
+            // TODO: save action
+            console.log('action: edit at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
         }
     });
 }
@@ -125,6 +134,10 @@ function resetOutputGrid() {
     syncFromEditionGridToDataGrid();
     CURRENT_OUTPUT_GRID = new Grid(3, 3);
     syncFromDataGridToEditionGrid();
+
+    // TODO: save action
+    console.log('action: reset grid');
+    
     resizeOutputGrid();
 }
 
@@ -139,6 +152,9 @@ function copyFromInput() {
     // modify grid size values
     $('#height').val(CURRENT_OUTPUT_GRID.height);
     $('#width').val(CURRENT_OUTPUT_GRID.width);
+
+    // TODO: save action
+    console.log('action: copy from input')
 }
 
 function fillPairPreview(pairId, inputGrid, outputGrid) {
@@ -419,6 +435,22 @@ function initializeSelectable() {
                     $('.ui-selected').each(function(i, e) {
                         $(e).removeClass('ui-selected');
                     });
+                },
+                stop: function(event, ui) {
+                    // log data that is selected
+                    // TODO: figure out how to determine if input or output is selected
+                    
+                    selected = $('.ui-selected');
+                    
+                    SELECT_DATA = [];
+                    for (var i = 0; i < selected.length; i ++) {
+                        x = parseInt($(selected[i]).attr('x'));
+                        y = parseInt($(selected[i]).attr('y'));
+                        SELECT_DATA.push([x, y]);
+                    }
+                            
+                    console.log('action: selecting cells')
+                    console.log(SELECT_DATA)
                 }
             }
         );
@@ -434,15 +466,24 @@ $(document).ready(function () {
             $(preview).removeClass('selected-symbol-preview');
         })
         symbol_preview.addClass('selected-symbol-preview');
-
-        toolMode = $('input[name=tool_switching]:checked').val();
-        if (toolMode == 'select') {
+        
+        if ((toolMode == 'select') && ($('.edition_grid').find('.ui-selected').length > 0)) {
             $('.edition_grid').find('.ui-selected').each(function(i, cell) {
                 symbol = getSelectedSymbol();
                 setCellSymbol($(cell), symbol);
             });
+
+            // TODO: save action
+            console.log('action: selected cells changed colour to ' + symbol);
+        }
+        else {
+            // for edit and flood fill modes
+            console.log('action: changed color to ' + getSelectedSymbol());
         }
     });
+
+    // set starting colour to be black
+    // $('.symbol_preview symbol_0 selected selected-symbol-preview').addClass('selected-symbol-preview');
 
     $('.edition_grid').each(function(i, jqGrid) {
         setUpEditionGridListeners($(jqGrid));
@@ -457,6 +498,8 @@ $(document).ready(function () {
     });
 
     $('input[type=radio][name=tool_switching]').change(function() {
+        toolMode = $('input[name=tool_switching]:checked').val();
+        console.log('action: changed tool to ' + toolMode);
         initializeSelectable();
     });
 
@@ -479,6 +522,8 @@ $(document).ready(function () {
             }
             infoMsg('Cells copied! Select a target cell and press V to paste at location.');
 
+            // TODO: save action
+            console.log('action: copied selected cells')
         }
         if (event.which == 86) {
             // Press P
@@ -522,6 +567,9 @@ $(document).ready(function () {
                         setCellSymbol(cell, symbol);
                     }
                 }
+
+                // TODO: save action
+                console.log('action: pasted selected cells')
             } else {
                 errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
             }
