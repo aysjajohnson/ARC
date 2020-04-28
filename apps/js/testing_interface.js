@@ -45,6 +45,20 @@ var EDITION_GRID_HEIGHT = 500;
 var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
+// copy function
+
+function copy_dict() {
+    var copy = {};
+    Object.assign(copy, dict_template);
+    return copy;
+}
+
+
+// Initialize data storage -- list of dictionaries -- whenever a change is made to the grid, update
+var dict_template = {output_grid:CURRENT_OUTPUT_GRID, current_tool: "edit", current_color: 0, output_height: 3,
+output_width: 3, select_cells: [], select_values: 0, copy: Boolean(false), action: ""};
+var data = [copy_dict()];
+
 // Text helpers
 
 function help() {
@@ -103,6 +117,13 @@ function setUpEditionGridListeners(jqGrid) {
 
             // TODO: save action
             console.log('action: flood fill at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            dict_template["action"] = "floodfill";
+            dict_template["current_tool"] = "floodfill";
+            dict_template["select_cells"] = [cell.attr('x'), cell.attr('y')];
+            dict_template["current_color"] = symbol;
+            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+            data.push(copy_dict());
+            console.log(data)
         }
         else if (mode == 'edit') {
             // Else: fill just this cell.
@@ -215,6 +236,14 @@ function loadJSONTask(train, test) {
     CURRENT_TEST_PAIR_INDEX = 0;
     $('#current_test_input_id_display').html('1');
     $('#total_test_input_count_display').html(test.length);
+
+    // set black as the intial selected color
+    symbol_preview = $('#selected_first');
+    $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+        $(preview).removeClass('selected-symbol-preview');
+    })
+    symbol_preview.addClass('selected-symbol-preview');
+
 }
 
 function loadTaskFromFile(e) {
@@ -361,7 +390,6 @@ function displayNumAttempts(n) {
   // var nAttempts = $('#evaluation_output_editor');
   var nAttempts = $('#num_attempts');
   if (!nAttempts.length) {
-    console.log("here")
     nAttempts = $('<div id="num_attempts">Number of attempts: 1</div>');
     nAttempts.appendTo('#evaluation_output_editor')
   }
