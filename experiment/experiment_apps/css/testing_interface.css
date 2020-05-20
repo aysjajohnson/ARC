@@ -1,0 +1,209 @@
+body {
+    font-family: 'Verdana', sans-serif;
+    min-width: 1430px;
+}
+
+/*background used to be #d5d5d5 -- changing it to white #FFFFFF*/
+
+#workspace {
+    width: 1430px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#demonstration_examples_view {
+    float: left;
+    width: 450px;
+    margin: 10px;
+    margin-right: 5px;
+    background-color: #d5d5d5;
+}
+
+#evaluation_view {
+    float: left;
+    width: 950px;
+    margin: 10px;
+    margin-left: 5px;
+    background-color: #d5d5d5;
+    min-height: 850px;
+}
+
+#evaluation-input-view {
+    float: left;
+    width: 400px;
+    margin: 10px;
+}
+
+#evaluation_output_editor {
+    float: left;
+    width: 500px;
+    margin: 10px;
+    margin-bottom: 10px;
+}
+
+#load_task_control_btns {
+    float: left;
+    margin-top: 10px;
+    margin-bottom: 0;
+    background: white;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#editor_grid_control_btns {
+    float: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: white;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+}
+
+#resize_control_btns {
+    width: 100%;
+    float:left;
+    margin-bottom: 10px;
+}
+
+#submit_solution_btn {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: rgb(28, 184, 65);
+}
+
+#submit_solution_btn:active {
+  background: blue;
+}
+
+button:focus {outline:0;}
+
+#output_grid {
+
+}
+
+#toolbar {
+    float: left;
+    /* background: white; */
+    /* margin-left: 10px; */
+    /* margin-top: 10px; */
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#symbol_picker {
+    float: left;
+    /* background: white; */
+    margin-left: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.symbol_preview {
+    width: 25px;
+    height: 25px;
+    float: left;
+}
+
+label_heading {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+label {
+    margin-left: 10px;
+}
+
+input, button {
+    /* font-size: 16px; */
+    margin-left: 10px;
+    /* border-radius: 2px; */
+}
+
+#resize_btn {
+    margin-left: 0;
+}
+
+/*Task demonstration*/
+
+.pair_preview {
+    height: 250px;
+    padding: 5px;
+    border-bottom: solid 1px #a1a1a1;
+}
+.input_preview {
+    height: 200px;
+    width: 200px;
+    float: left;
+}
+.output_preview {
+    height: 200px;
+    width: 200px;
+    float: left;
+    margin-left: 35px;
+}
+
+.preview_block {
+   height: 200px;
+   width: 200px;
+   float: left; 
+}
+
+.text {
+    text-align: center;
+    background: white;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.subTextLeft {
+    text-align: center;
+    /* background: white; */
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.subTextRight {
+    text-align: center;
+    /* background: white; */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    float: right;
+    margin-right: 10px;
+}
+
+#task_demo_header {
+    margin: 10px;
+}
+
+#modal_bg {
+    background-color: black;
+    width: 100%;
+    min-height: 10000px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+#modal {
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    padding: 100px;
+    width: 500px;
+    margin-top: 100px;
+}
+
+#modal input {
+    margin-left: 70px;
+}
+
+br {
+   display: block;
+   margin: 10px 0;
+}
