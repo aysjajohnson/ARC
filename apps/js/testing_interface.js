@@ -20,7 +20,7 @@ $(document).ready(function () {
     });
     
     // automatically load a random task
-    randomTask();
+    // randomTask();
 });
 
 
@@ -36,6 +36,8 @@ var taskList = new Array();
 $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
     taskList.push(tasks);
 });
+
+
 // creating a variable task to keep track of what the last task was
 var prevTask = "None";
 var numAttempts = 0;
@@ -46,13 +48,11 @@ var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
 // copy function
-
 function copy_dict() {
     var copy = {};
     Object.assign(copy, dict_template);
     return copy;
 }
-
 
 // Initialize data storage -- list of dictionaries -- whenever a change is made to the grid, update
 var dict_template = {output_grid:CURRENT_OUTPUT_GRID, current_tool: "edit", current_color: 0, output_height: 3,
@@ -130,6 +130,12 @@ function setUpEditionGridListeners(jqGrid) {
             setCellSymbol(cell, symbol);
 
             // TODO: save action
+            dict_template["action"] = "edit";
+            dict_template["current_tool"] = "edit";
+            dict_template["select_cells"] = [cell.attr('x'), cell.attr('y')];
+            dict_template["current_color"] = symbol;
+            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+            data.push(copy_dict());
             console.log('action: edit at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
         }
     });
@@ -151,15 +157,48 @@ function resizeOutputGrid() {
     refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
 }
 
+function resetColorBlack() {
+    symbol_preview = $('#selected_first');
+    $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+        $(preview).removeClass('selected-symbol-preview');
+    })
+    symbol_preview.addClass('selected-symbol-preview');
+}
+
 function resetOutputGrid() {
     syncFromEditionGridToDataGrid();
     CURRENT_OUTPUT_GRID = new Grid(3, 3);
     syncFromDataGridToEditionGrid();
 
+    // resize grid
+    jqGrid = $('#output_grid .edition_grid');
+    syncFromEditionGridToDataGrid();
+    dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
+    CURRENT_OUTPUT_GRID = new Grid(3, 3, dataGrid);
+    refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
+
+    // set drop down values
+    height  = $('#height').val(3).change;
+    width = $('#width').val(3).change;
+
     // TODO: save action
+    dict_template["output_height"] = 3;
+    dict_template["output_width"] = 3;
+    dict_template["action"] = "resetOutputGrid";
+    dict_template["current_tool"] = "edit";
+    dict_template["select_cells"] = [];
+    dict_template["select_values"] = [];
+    dict_template["current_color"] = 0;
+    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+    dict_template["copy"] = false;
+    data.push(copy_dict());
     console.log('action: reset grid');
-    
-    resizeOutputGrid();
+
+    // set color selector back to black
+    resetColorBlack();
+
+    // set initial tool to be edit
+    document.getElementById("tool_edit").checked = true;
 }
 
 function copyFromInput() {
@@ -175,6 +214,14 @@ function copyFromInput() {
     $('#width').val(CURRENT_OUTPUT_GRID.width);
 
     // TODO: save action
+    dict_template["output_height"] = CURRENT_INPUT_GRID.height;
+    dict_template["output_width"] = CURRENT_INPUT_GRID.width;
+    dict_template["action"] = "copyFromInput";
+    dict_template["current_tool"] = "edit";
+    dict_template["select_cells"] = [];
+    dict_template["select_values"] = [];
+    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+    dict_template["copy"] = false;
     console.log('action: copy from input')
 }
 
@@ -238,11 +285,7 @@ function loadJSONTask(train, test) {
     $('#total_test_input_count_display').html(test.length);
 
     // set black as the intial selected color
-    symbol_preview = $('#selected_first');
-    $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-        $(preview).removeClass('selected-symbol-preview');
-    })
-    symbol_preview.addClass('selected-symbol-preview');
+    resetColorBlack();
 
 }
 
@@ -478,7 +521,14 @@ function initializeSelectable() {
                     }
                             
                     console.log('action: selecting cells')
+                    dict_template["action"] = "selectingCells";
+                    dict_template["current_tool"] = "select";
+                    dict_template["select_cells"] = [x,y];
+                    dict_template["select_values"] = [];
+                    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+                    dict_template["copy"] = false;
                     console.log(SELECT_DATA)
+
                 }
             }
         );
@@ -502,7 +552,14 @@ $(document).ready(function () {
             });
 
             // TODO: save action
+            dict_template["action"] = "selected cells changed color to";
+            dict_template["current_tool"] = "select";
+            dict_template["select_cells"] = [$('.edition_grid').find('.ui-selected')];
+            dict_template["current_color"] = symbol;
+            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
+            dict_template["copy"] = false;
             console.log('action: selected cells changed colour to ' + symbol);
+            console.log(data)
         }
         else {
             // for edit and flood fill modes

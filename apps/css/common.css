@@ -1,8 +1,9 @@
+/*changed cell background from grey to white*/
 .cell {
     width: 100px;
     height: 100px;
-    border-left: 1px solid #aaa;
-    border-top: 1px solid #aaa;
+    border-left: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
     float: left;
     background-color: #000;
 }

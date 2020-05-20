@@ -3,6 +3,8 @@ body {
     min-width: 1430px;
 }
 
+/*background used to be #d5d5d5 -- changing it to white #FFFFFF*/
+
 #workspace {
     width: 1430px;
     margin-left: auto;
