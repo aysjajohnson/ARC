@@ -8,15 +8,17 @@ $(document).ready(function () {
 
     // add things to detect if height or width are resized
     $('#height').change(function() {
-        console.log('action: changed height of output grid to ' +
-                    $('#height').val());
+        // console.log('action: changed height of output grid to ' +
+        //            $('#height').val());
         resizeOutputGrid()
+        save(action = "changed height");
     });
 
     $('#width').change(function() {
-        console.log('action: changed width of output grid to ' +
-                    $('#width').val());
+        // console.log('action: changed width of output grid to ' +
+        //            $('#width').val());
         resizeOutputGrid()
+        save(action = "changed width");
     });
     
     // automatically load a random task
@@ -41,23 +43,58 @@ $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training
 // creating a variable task to keep track of what the last task was
 var prevTask = "None";
 var numAttempts = 0;
+var numActions = 0;
 
 // Cosmetic.
 var EDITION_GRID_HEIGHT = 500;
 var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
-// copy function
-function copy_dict() {
-    var copy = {};
-    Object.assign(copy, dict_template);
-    return copy;
+// save function
+save_data = new Array();
+function save(action = "", select_data = Array(), copy_data = Array()){
+    // want to save # step integer, action, # output_grid, # current_tool, # current_color, # height/width, 
+    // # select_cells, # select_values, # copy
+    window.numActions ++;
+    save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
+        select_data, copy_data)
+    save_data.push(save_list);
+    console.log(save_data)
 }
 
-// Initialize data storage -- list of dictionaries -- whenever a change is made to the grid, update
-var dict_template = {output_grid:CURRENT_OUTPUT_GRID, current_tool: "edit", current_color: 0, output_height: 3,
-output_width: 3, select_cells: [], select_values: 0, copy: Boolean(false), action: ""};
-var data = [copy_dict()];
+// querying variables
+function selected_tool() {
+    mode = $('input[name=tool_switching]:checked').val();
+    return(mode);
+}
+
+function getSelectedSymbol() {
+    selected = $('#symbol_picker .selected-symbol-preview')[0];
+    return $(selected).attr('symbol');
+}
+
+function get_size() {
+    height = $('#height').val();
+    width = $('#width').val();
+    return Array(height, width);
+}
+
+// converting output grid to string
+function output_to_string(){
+    syncFromEditionGridToDataGrid();
+    var stringGrid = "";
+    var dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
+    for (var i = 0; i < dataGrid.length; i++) {
+        if (i == dataGrid.length - 1) {
+            stringGrid = stringGrid.concat(dataGrid[i].toString())
+        }
+        else {
+            stringGrid = stringGrid.concat(dataGrid[i].toString());
+            stringGrid = stringGrid.concat("|");
+        }
+    }
+    return stringGrid;
+}
 
 // Text helpers
 
@@ -97,11 +134,6 @@ function syncFromDataGridToEditionGrid() {
     refreshEditionGrid($('#output_grid .edition_grid'), CURRENT_OUTPUT_GRID);
 }
 
-function getSelectedSymbol() {
-    selected = $('#symbol_picker .selected-symbol-preview')[0];
-    return $(selected).attr('symbol');
-}
-
 function setUpEditionGridListeners(jqGrid) {
     jqGrid.find('.cell').click(function(event) {
         cell = $(event.target);
@@ -116,37 +148,21 @@ function setUpEditionGridListeners(jqGrid) {
             syncFromDataGridToEditionGrid();
 
             // TODO: save action
-            console.log('action: flood fill at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
-            dict_template["action"] = "floodfill";
-            dict_template["current_tool"] = "floodfill";
-            dict_template["select_cells"] = [cell.attr('x'), cell.attr('y')];
-            dict_template["current_color"] = symbol;
-            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-            data.push(copy_dict());
-            console.log(data)
+            // console.log('action: flood fill at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            save(action="floodfill");
         }
         else if (mode == 'edit') {
             // Else: fill just this cell.
             setCellSymbol(cell, symbol);
 
             // TODO: save action
-            dict_template["action"] = "edit";
-            dict_template["current_tool"] = "edit";
-            dict_template["select_cells"] = [cell.attr('x'), cell.attr('y')];
-            dict_template["current_color"] = symbol;
-            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-            data.push(copy_dict());
-            console.log('action: edit at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            // console.log('action: edit at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            save(action="edit");
         }
     });
 }
 
 function resizeOutputGrid() {
-    // size = $('#output_grid_size').val();
-    // size = $('#height').val();
-    // size = parseSizeTuple(size);
-    // height = size[0];
-    // width = size[1];
     height = $('#height').val();
     width = $('#width').val();
 
@@ -155,6 +171,7 @@ function resizeOutputGrid() {
     dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     CURRENT_OUTPUT_GRID = new Grid(height, width, dataGrid);
     refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
+
 }
 
 function resetColorBlack() {
@@ -181,24 +198,15 @@ function resetOutputGrid() {
     height  = $('#height').val(3).change;
     width = $('#width').val(3).change;
 
-    // TODO: save action
-    dict_template["output_height"] = 3;
-    dict_template["output_width"] = 3;
-    dict_template["action"] = "resetOutputGrid";
-    dict_template["current_tool"] = "edit";
-    dict_template["select_cells"] = [];
-    dict_template["select_values"] = [];
-    dict_template["current_color"] = 0;
-    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-    dict_template["copy"] = false;
-    data.push(copy_dict());
-    console.log('action: reset grid');
-
     // set color selector back to black
     resetColorBlack();
 
     // set initial tool to be edit
     document.getElementById("tool_edit").checked = true;
+
+    // TODO: save action
+    // console.log('action: reset grid');
+    save(action="reset grid")
 }
 
 function copyFromInput() {
@@ -214,15 +222,8 @@ function copyFromInput() {
     $('#width').val(CURRENT_OUTPUT_GRID.width);
 
     // TODO: save action
-    dict_template["output_height"] = CURRENT_INPUT_GRID.height;
-    dict_template["output_width"] = CURRENT_INPUT_GRID.width;
-    dict_template["action"] = "copyFromInput";
-    dict_template["current_tool"] = "edit";
-    dict_template["select_cells"] = [];
-    dict_template["select_values"] = [];
-    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-    dict_template["copy"] = false;
-    console.log('action: copy from input')
+    // console.log('action: copy from input')
+    save(action="copy from input")
 }
 
 function fillPairPreview(pairId, inputGrid, outputGrid) {
@@ -520,14 +521,8 @@ function initializeSelectable() {
                         SELECT_DATA.push([x, y]);
                     }
                             
-                    console.log('action: selecting cells')
-                    dict_template["action"] = "selectingCells";
-                    dict_template["current_tool"] = "select";
-                    dict_template["select_cells"] = [x,y];
-                    dict_template["select_values"] = [];
-                    dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-                    dict_template["copy"] = false;
-                    console.log(SELECT_DATA)
+                    // console.log('action: selecting cells')
+                    save(action = "selecting cells", select_data = SELECT_DATA);
 
                 }
             }
@@ -552,23 +547,16 @@ $(document).ready(function () {
             });
 
             // TODO: save action
-            dict_template["action"] = "selected cells changed color to";
-            dict_template["current_tool"] = "select";
-            dict_template["select_cells"] = [$('.edition_grid').find('.ui-selected')];
-            dict_template["current_color"] = symbol;
-            dict_template["output_grid"] = CURRENT_OUTPUT_GRID;
-            dict_template["copy"] = false;
-            console.log('action: selected cells changed colour to ' + symbol);
-            console.log(data)
+            // console.log('action: selected cells changed colour to ' + symbol);
+            save(action = "selected cells change color")
         }
         else {
             // for edit and flood fill modes
-            console.log('action: changed color to ' + getSelectedSymbol());
+            // console.log('action: changed color to ' + getSelectedSymbol());
+            save(action = "changed color")
+            
         }
     });
-
-    // set starting colour to be black
-    // $('.symbol_preview symbol_0 selected selected-symbol-preview').addClass('selected-symbol-preview');
 
     $('.edition_grid').each(function(i, jqGrid) {
         setUpEditionGridListeners($(jqGrid));
@@ -584,7 +572,8 @@ $(document).ready(function () {
 
     $('input[type=radio][name=tool_switching]').change(function() {
         toolMode = $('input[name=tool_switching]:checked').val();
-        console.log('action: changed tool to ' + toolMode);
+        // console.log('action: changed tool to ' + toolMode);
+        save(action = "changed tool")
         initializeSelectable();
     });
 
@@ -605,10 +594,12 @@ $(document).ready(function () {
                 symbol = parseInt($(selected[i]).attr('symbol'));
                 COPY_PASTE_DATA.push([x, y, symbol]);
             }
+            save(copy_data = COPY_PASTE_DATA)
             infoMsg('Cells copied! Select a target cell and press V to paste at location.');
 
             // TODO: save action
-            console.log('action: copied selected cells')
+            // console.log('action: copied selected cells')
+            save(action = "copied selected cells")
         }
         if (event.which == 86) {
             // Press P
@@ -654,7 +645,8 @@ $(document).ready(function () {
                 }
 
                 // TODO: save action
-                console.log('action: pasted selected cells')
+                // console.log('action: pasted selected cells')
+                save(action = "pasted selected cells")
             } else {
                 errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
             }
