@@ -25,6 +25,10 @@ $(document).ready(function () {
     // randomTask();
 });
 
+// Experiment grids
+var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
+    '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
+    '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
 
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
@@ -33,28 +37,55 @@ var TEST_PAIRS = new Array();
 var CURRENT_TEST_PAIR_INDEX = 0;
 var SELECT_DATA = new Array();
 var COPY_PASTE_DATA = new Array();
-var taskList = new Array();
-// creating a list of tasks in order to tell where we are
-$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
-    taskList.push(tasks);
-});
-
-
-// creating a variable task to keep track of what the last task was
-var prevTask = "None";
-var numAttempts = 0;
-var numActions = 0;
 
 // Cosmetic.
 var EDITION_GRID_HEIGHT = 500;
 var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
+// creating a list of tasks in order to tell where we are
+$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+    for (i=0; i<tasks.length; i++) {
+        if (grids.includes(tasks[i].name)) {
+            taskList.push([tasks[i],i]);
+        }
+    }
+    shuffle(taskList)
+    // taskList.push(tasks);
+});
+
+// shuffle function from stack overflow
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+// creating variables to keep track of global information
+var prevTask = "None";
+var numAttempts = 0;
+var numActions = 0;
+var task_index = 0;
+var taskList = new Array();
+var wrongSolution = Boolean(true);
+
 // save function
 save_data = new Array();
 function save(action = "", select_data = Array(), copy_data = Array()){
-    // want to save # step integer, action, # output_grid, # current_tool, # current_color, # height/width, 
-    // # select_cells, # select_values, # copy
     window.numActions ++;
     save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
         select_data, copy_data)
@@ -355,7 +386,8 @@ function verify(task) {
       // $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
       index = findTask()
-      $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
+      // $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
+      $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
   })
   .error(function(){
     errorMsg('Error loading task');
@@ -369,7 +401,20 @@ function firstTask() {
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
     function(tasks) {
       var task = tasks[0];
-      var task_index = 0;
+      window.prevTask = task["name"];
+      verify(task);
+    })
+    .error(function(){
+      errorMsg('Error loading task list');
+    });
+}
+
+function startExperiment() {
+    console.log(taskList)
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+    function(tasks) {
+      var task = tasks[taskList[0][1]];
       window.prevTask = task["name"];
       verify(task);
     })
@@ -379,15 +424,26 @@ function firstTask() {
 }
 
 function nextTask() {
+    if (wrongSolution && numAttempts !== 3) {
+        errorMsg('You havent correctly submitted')
+        return
+    }
+    window.wrongSolution = Boolean(true);
     var subset = "training";
+    window.numAttempts = 0;
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
         function(tasks) {
-        var task = move(tasks, 1)
+        window.task_index ++; 
+        var task = tasks[taskList[task_index][1]];
         verify(task);
     })
     .error(function(){
       errorMsg('Error loading task list');
     });
+
+    if (task_index == 10) {
+        errorMsg('This is the last task')
+    }
 }
 
 function previousTask() {
@@ -449,28 +505,41 @@ function displayNumAttempts(n) {
 }
 
 function submitSolution() {
+    console.log('submit solution')
     syncFromEditionGridToDataGrid();
     reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
     submitted_output = CURRENT_OUTPUT_GRID.grid;
-    if (reference_output.length != submitted_output.length) {
+    console.log('submit solution')
+    if (reference_output.length !== submitted_output.length) {
+        console.log('wrong shape')
         errorMsg('Wrong solution.');
-        numAttempts ++;
+        // numAttempts ++;
         // displayNumAttempts(numAttempts);
         return
     }
+    console.log('in function')
     for (var i = 0; i < reference_output.length; i++){
         ref_row = reference_output[i];
         for (var j = 0; j < ref_row.length; j++){
-            if (ref_row[j] != submitted_output[i][j]) {
+            if (ref_row[j] !== submitted_output[i][j]) {
+                console.log('here')
+                window.numAttempts ++;
+                console.log(numAttempts);
+                if (numAttempts == 3) {
+                    console.log('3 attempts')
+                    errorMsg('You made three errors, you will move on to the next task');
+                    nextTask();
+                }
+                $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
                 errorMsg('Wrong solution.');
-                numAttempts ++;
                 // displayNumAttempts(numAttempts);
                 return
             }
         }
 
     }
-    numAttempts++;
+    window.numAttempts++;
+    window.wrongSolution = Boolean(false);
     // displayNumAttempts(numAttempts);
     infoMsg('Correct solution!');
 }
