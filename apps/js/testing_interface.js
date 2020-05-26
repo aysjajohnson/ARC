@@ -95,7 +95,7 @@ function save(action = "", select_data = Array(), copy_data = Array()){
     save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
         select_data, copy_data, taskName);
     save_data.push(save_list);
-    console.log(save_data)
+    // console.log(save_data)
 }
 
 // querying variables
@@ -370,7 +370,7 @@ function startExperiment() {
 }
 
 function nextTask() {
-    sleep(500).then(() => {
+    sleep(1000).then(() => {
         var subset = "training";
         window.numAttempts = 0;
         $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
@@ -417,45 +417,48 @@ function displayInfoBar(task_index, numAttempts){
 }
 
 function submitSolution() {
-    save(action="submit")
-    syncFromEditionGridToDataGrid();
-    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
-    submitted_output = CURRENT_OUTPUT_GRID.grid;
-    if (reference_output.length !== submitted_output.length) {
-        errorMsg('Wrong shape.');
-        numAttempts ++;
-        if (numAttempts == maxNumAttempts) {
-            errorMsg('You made three errors, you will move on to the next task');
-            nextTask();
-        }
-        displayInfoBar(task_index, numAttempts);
-        // numAttempts ++;
-        // displayNumAttempts(numAttempts);
-        return
-    }
-
-    for (var i = 0; i < reference_output.length; i++){
-        ref_row = reference_output[i];
-        for (var j = 0; j < ref_row.length; j++){
-            if (ref_row[j] !== submitted_output[i][j]) {
-                window.numAttempts ++;
-                if (numAttempts == maxNumAttempts) {
-                    errorMsg('You made three errors, you will move on to the next task');
-                    nextTask();
-                }
-                displayInfoBar(task_index, numAttempts);
-                errorMsg('Wrong solution.');
-                // displayNumAttempts(numAttempts);
-                return
+    if (window.confirm("Are you ready to submit?")) { 
+        save(action="submit")
+        syncFromEditionGridToDataGrid();
+        reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+        submitted_output = CURRENT_OUTPUT_GRID.grid;
+        if (reference_output.length !== submitted_output.length) {
+            errorMsg('Wrong shape.');
+            numAttempts ++;
+            if (numAttempts == maxNumAttempts) {
+                errorMsg('You made three errors, you will move on to the next task');
+                nextTask();
             }
+            displayInfoBar(task_index, numAttempts);
+            // numAttempts ++;
+            // displayNumAttempts(numAttempts);
+            return
         }
 
+        for (var i = 0; i < reference_output.length; i++){
+            ref_row = reference_output[i];
+            for (var j = 0; j < ref_row.length; j++){
+                if (ref_row[j] !== submitted_output[i][j]) {
+                    window.numAttempts ++;
+                    if (numAttempts == maxNumAttempts) {
+                        errorMsg('You made three errors, you will move on to the next task');
+                        nextTask();
+                    }
+                    displayInfoBar(task_index, numAttempts);
+                    errorMsg('Wrong solution.');
+                    // displayNumAttempts(numAttempts);
+                    return
+                }
+            }
+
+        }
+        window.numAttempts++;
+        // displayNumAttempts(numAttempts);
+        infoMsg('Correct solution!');
+        nextTask();
     }
-    window.numAttempts++;
-    // displayNumAttempts(numAttempts);
-    infoMsg('Correct solution!');
-    nextTask();
 }
+    
 
 // function findTask() {
 //    for (i = 0; i < taskList[0].length; i++) {
