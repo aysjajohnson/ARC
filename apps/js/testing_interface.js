@@ -43,19 +43,7 @@ var EDITION_GRID_HEIGHT = 500;
 var EDITION_GRID_WIDTH = 500;
 var MAX_CELL_SIZE = 100;
 
-// creating a list of tasks in order to tell where we are
-$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
-    for (i=0; i<tasks.length; i++) {
-        if (grids.includes(tasks[i].name)) {
-            taskList.push([tasks[i],i]);
-        }
-    }
-    shuffle(taskList)
-    // taskList.push(tasks);
-});
-
 // shuffle function from stack overflow
-
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -75,20 +63,37 @@ function shuffle(array) {
   return array;
 }
 
+// creating a list of tasks in order to tell where we are
+$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+    for (i=0; i<tasks.length; i++) {
+        if (grids.includes(tasks[i].name)) {
+            taskList.push([tasks[i],i]);
+        }
+    }
+    shuffle(taskList)
+    // taskList.push(tasks);
+});
+
+// sleep function
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 // creating variables to keep track of global information
 var prevTask = "None";
+var taskName = "";
 var numAttempts = 0;
 var numActions = 0;
 var task_index = 0;
+var maxNumAttempts = 3;
 var taskList = new Array();
-var wrongSolution = Boolean(true);
 
 // save function
 save_data = new Array();
 function save(action = "", select_data = Array(), copy_data = Array()){
     window.numActions ++;
     save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
-        select_data, copy_data)
+        select_data, copy_data, taskName);
     save_data.push(save_list);
     console.log(save_data)
 }
@@ -347,30 +352,42 @@ function loadTaskFromFile(e) {
 
 // Helper functions for loading different tasks
 
-function findTask() {
-   for (i = 0; i < taskList[0].length; i++) {
-        if (taskList[0][i]["name"] == prevTask) {
-            return i;
-        };
-    };   
+// Used in this experiment
+
+function startExperiment() {
+    // console.log(taskList)
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+    function(tasks) {
+      var task = tasks[taskList[0][1]];
+      window.taskName = task.name;
+      window.prevTask = task["name"];
+      verify(task);
+    })
+    .error(function(){
+      errorMsg('Error loading task list');
+    });
 }
 
-function move(tasks, step) {
-  index = findTask()
-  if (index == 0 && step == -1) {
-    errorMsg("No previous grids")
-  } 
-  if (index + 1 == tasks.length && step == 1) {
-    errorMsg("No more grids")
-  }
-  else {
-    var taskNum = index + step;
-    var task = tasks[taskNum];
-    window.prevTask = task["name"];
-    window.numAttempts = 0;
-    // displayNumAttempts(numAttempts);
-    return task;
-  }
+function nextTask() {
+    sleep(500).then(() => {
+        var subset = "training";
+        window.numAttempts = 0;
+        $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
+            function(tasks) {
+            window.task_index ++; 
+            var task = tasks[taskList[task_index][1]];
+            verify(task);
+        })
+        .error(function(){
+          errorMsg('Error loading task list');
+        });
+
+        if (task_index == 10) {
+            errorMsg('This is the last task')
+        }
+
+    })   
 }
 
 function verify(task) {
@@ -385,93 +402,131 @@ function verify(task) {
       loadJSONTask(train, test);
       // $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
-      index = findTask()
+      // index = findTask()
       // $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
       $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
+      window.taskName = task.name;
   })
   .error(function(){
     errorMsg('Error loading task');
   });
 }
 
-// Loading first, next, previous, and random tasks
-
-function firstTask() {
-    var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-    function(tasks) {
-      var task = tasks[0];
-      window.prevTask = task["name"];
-      verify(task);
-    })
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
+function displayInfoBar(task_index, numAttempts){
+    $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
 }
 
-function startExperiment() {
-    console.log(taskList)
-    var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-    function(tasks) {
-      var task = tasks[taskList[0][1]];
-      window.prevTask = task["name"];
-      verify(task);
-    })
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
-}
-
-function nextTask() {
-    if (wrongSolution && numAttempts !== 3) {
-        errorMsg('You havent correctly submitted')
+function submitSolution() {
+    save(action="submit")
+    syncFromEditionGridToDataGrid();
+    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+    submitted_output = CURRENT_OUTPUT_GRID.grid;
+    if (reference_output.length !== submitted_output.length) {
+        errorMsg('Wrong shape.');
+        numAttempts ++;
+        if (numAttempts == maxNumAttempts) {
+            errorMsg('You made three errors, you will move on to the next task');
+            nextTask();
+        }
+        displayInfoBar(task_index, numAttempts);
+        // numAttempts ++;
+        // displayNumAttempts(numAttempts);
         return
     }
-    window.wrongSolution = Boolean(true);
-    var subset = "training";
-    window.numAttempts = 0;
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
-        function(tasks) {
-        window.task_index ++; 
-        var task = tasks[taskList[task_index][1]];
-        verify(task);
-    })
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
 
-    if (task_index == 10) {
-        errorMsg('This is the last task')
+    for (var i = 0; i < reference_output.length; i++){
+        ref_row = reference_output[i];
+        for (var j = 0; j < ref_row.length; j++){
+            if (ref_row[j] !== submitted_output[i][j]) {
+                window.numAttempts ++;
+                if (numAttempts == maxNumAttempts) {
+                    errorMsg('You made three errors, you will move on to the next task');
+                    nextTask();
+                }
+                displayInfoBar(task_index, numAttempts);
+                errorMsg('Wrong solution.');
+                // displayNumAttempts(numAttempts);
+                return
+            }
+        }
+
     }
+    window.numAttempts++;
+    // displayNumAttempts(numAttempts);
+    infoMsg('Correct solution!');
+    nextTask();
 }
 
-function previousTask() {
-    var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-              function(tasks) {  
-      var task = move(tasks,-1)
-      verify(task)
-    })
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
-}
+// function findTask() {
+//    for (i = 0; i < taskList[0].length; i++) {
+//         if (taskList[0][i]["name"] == prevTask) {
+//             return i;
+//         };
+//     };   
+// }
 
-function randomTask() {
-    var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,  
-              function(tasks) {
-      var task = tasks[Math.floor(Math.random() * tasks.length)];
-      prevTask = task["name"];
-      window.numAttempts = 0;
-      // displayNumAttempts(numAttempts);
-      verify(task);
-    })
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
-}
+// function move(tasks, step) {
+//   index = findTask()
+//   if (index == 0 && step == -1) {
+//     errorMsg("No previous grids")
+//   } 
+//   if (index + 1 == tasks.length && step == 1) {
+//     errorMsg("No more grids")
+//   }
+//   else {
+//     var taskNum = index + step;
+//     var task = tasks[taskNum];
+//     window.prevTask = task["name"];
+//     window.numAttempts = 0;
+//     // displayNumAttempts(numAttempts);
+//     return task;
+//   }
+// }
+
+
+// Loading first, next, previous, and random tasks
+
+// function firstTask() {
+//     var subset = "training";
+//     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+//     function(tasks) {
+//       var task = tasks[0];
+//       window.prevTask = task["name"];
+//       verify(task);
+//     })
+//     .error(function(){
+//       errorMsg('Error loading task list');
+//     });
+// }
+
+
+
+// function previousTask() {
+//     var subset = "training";
+//     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+//               function(tasks) {  
+//       var task = move(tasks,-1)
+//       verify(task)
+//     })
+//     .error(function(){
+//       errorMsg('Error loading task list');
+//     });
+// }
+
+// function randomTask() {
+//     var subset = "training";
+//     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,  
+//               function(tasks) {
+//       var task = tasks[Math.floor(Math.random() * tasks.length)];
+//       prevTask = task["name"];
+//       window.numAttempts = 0;
+//       // displayNumAttempts(numAttempts);
+//       verify(task);
+//     })
+//     .error(function(){
+//       errorMsg('Error loading task list');
+//     });
+// }
 
 function nextTestInput() {
     if (TEST_PAIRS.length <= CURRENT_TEST_PAIR_INDEX + 1) {
@@ -502,46 +557,6 @@ function displayNumAttempts(n) {
   // var nAttempts = $('<div id="num_attempts">Number of attempts: </div>');
   // nAttempts.appendTo('#evaluation_output_editor');
 
-}
-
-function submitSolution() {
-    console.log('submit solution')
-    syncFromEditionGridToDataGrid();
-    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
-    submitted_output = CURRENT_OUTPUT_GRID.grid;
-    console.log('submit solution')
-    if (reference_output.length !== submitted_output.length) {
-        console.log('wrong shape')
-        errorMsg('Wrong solution.');
-        // numAttempts ++;
-        // displayNumAttempts(numAttempts);
-        return
-    }
-    console.log('in function')
-    for (var i = 0; i < reference_output.length; i++){
-        ref_row = reference_output[i];
-        for (var j = 0; j < ref_row.length; j++){
-            if (ref_row[j] !== submitted_output[i][j]) {
-                console.log('here')
-                window.numAttempts ++;
-                console.log(numAttempts);
-                if (numAttempts == 3) {
-                    console.log('3 attempts')
-                    errorMsg('You made three errors, you will move on to the next task');
-                    nextTask();
-                }
-                $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
-                errorMsg('Wrong solution.');
-                // displayNumAttempts(numAttempts);
-                return
-            }
-        }
-
-    }
-    window.numAttempts++;
-    window.wrongSolution = Boolean(false);
-    // displayNumAttempts(numAttempts);
-    infoMsg('Correct solution!');
 }
 
 function fillTestInput(inputGrid) {
