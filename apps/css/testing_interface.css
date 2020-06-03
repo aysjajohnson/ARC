@@ -5,6 +5,10 @@ body {
 
 /*background used to be #d5d5d5 -- changing it to white #FFFFFF*/
 
+/*#current_task {
+    width: 500px;
+}*/
+
 #workspace {
     width: 1430px;
     margin-left: auto;
@@ -41,14 +45,26 @@ body {
     margin-bottom: 10px;
 }
 
+#parent_load_control_btns {
+    text-align: center;
+    align-items: center;
+    align-content: center;
+}
+
 #load_task_control_btns {
     float: left;
     margin-top: 10px;
     margin-bottom: 0;
+    margin-left: 100px;
     background: white;
-    width: 100%;
+    width: 75%;
     padding-top: 5px;
     padding-bottom: 5px;
+    align-self: center;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    align-items: right;
 }
 
 #editor_grid_control_btns {

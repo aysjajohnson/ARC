@@ -122,23 +122,38 @@ function setCellSymbol(cell, symbol) {
 }
 
 function errorMsg(msg) {
-    $('#error_display').stop(true, true);
-    $('#info_display').stop(true, true);
+    // $('#error_display').stop(true, true);
+    // $('#info_display').stop(true, true);
 
-    $('#error_display').hide();
-    $('#info_display').hide();
-    $('#error_display').html(msg);
-    $('#error_display').show();
-    $('#error_display').fadeOut(5000);
+    // $('#error_display').hide();
+    // $('#info_display').hide();
+    // $('#error_display').html(msg);
+    // $('#error_display').show();
+    // $('#error_display').fadeOut(5000);
+
+    $('#info_display').stop(true, true);
+    $("#info_display").css("color", "red");
+    $('#info_display').css("display", "inline");
+    $('#info_display').css("opacity", "1");
+    $('#info_display').html(msg);
+    $('#info_display').animate({opacity: 0}, 5000);
+
 }
 
 function infoMsg(msg) {
-    $('#error_display').stop(true, true);
-    $('#info_display').stop(true, true);
+    // $('#error_display').stop(true, true);
+    // $('#info_display').stop(true, true);
 
-    $('#info_display').hide();
-    $('#error_display').hide();
+    // $('#info_display').hide();
+    // $('#error_display').hide();
+    // $('#info_display').html(msg);
+    // $('#info_display').show();
+    // $('#info_display').fadeOut(5000);
+
+    $('#info_display').stop(true, true);
+    $("#info_display").css("color", "green");
+    $('#info_display').css("display", "inline");
+    $("#info_display").css("opacity", "1");
     $('#info_display').html(msg);
-    $('#info_display').show();
-    $('#info_display').fadeOut(5000);
+    $('#info_display').animate({opacity: 0}, 5000);
 }

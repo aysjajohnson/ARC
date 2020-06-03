@@ -95,7 +95,7 @@ function save(action = "", select_data = Array(), copy_data = Array()){
     save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
         select_data, copy_data, taskName);
     save_data.push(save_list);
-    // console.log(save_data)
+    console.log(save_data)
 }
 
 // querying variables
@@ -400,11 +400,8 @@ function verify(task) {
           return;
       }
       loadJSONTask(train, test);
-      // $('#load_task_file_input')[0].value = "";
       infoMsg("Loaded task training/" + task["name"]);
-      // index = findTask()
-      // $('#current_task').text('Task name: '+ task["name"] + ', ' + index + ' out of 400');
-      $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
+      $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
       window.taskName = task.name;
   })
   .error(function(){
@@ -413,7 +410,7 @@ function verify(task) {
 }
 
 function displayInfoBar(task_index, numAttempts){
-    $('#current_task').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts);
+    $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
 }
 
 function submitSolution() {
@@ -430,8 +427,6 @@ function submitSolution() {
                 nextTask();
             }
             displayInfoBar(task_index, numAttempts);
-            // numAttempts ++;
-            // displayNumAttempts(numAttempts);
             return
         }
 
