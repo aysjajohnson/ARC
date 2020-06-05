@@ -20,7 +20,7 @@
       <div id="modal">
         <div>Welcome to the ARC testing interface. <br /> Choose a task file to start, or click on "Random task" to load one from the ARC project on github.</div>
         <br />
-        <input type="file" class="load_task"/>
+        <!-- <input type="file" class="load_task"/> -->
         <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
         <button onclick="startExperiment()" id="random_task_btn">Start experiment</button>
         <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
@@ -38,15 +38,15 @@
       <div id="parent_load_task_control_btns">
         <div id="load_task_control_btns">
             <div class="text" id="current_task">
-              <span ></span>
-              <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
+              <span></span>
+              <button onclick="submitSolution()" id="submit_solution_btn">Submit</button>
 <!--             <div id="error_display"></div> -->
             <div id="info_display"></div>
             </div>
           </div>
         </div>
       <div id="evaluation-input-view">
-        <div class="text">Test Input
+        <div class="text" id="test_input_header">Test Input
           <!-- <span id="current_test_input_id_display">0</span>/<span id="total_test_input_count_display">0</span> -->
           <!-- <button onclick="nextTestInput()">Next test input</button> -->
         </div>
@@ -57,7 +57,7 @@
     </div>
 
     <div id="evaluation_output_editor">
-      <div class="text">Test Output
+      <div class="text" id="test_output_header">Test Output
       </div>        
       <div id="output_grid">
         <div class="edition_grid selectable_grid">
@@ -83,25 +83,25 @@
         <div id="editor_grid_control_btns">
           <div id="toolbar">
             <div>
-              <label_heading for="edit">Select Tool</label_heading>
+              <label_heading for="edit" id="toolbar_heading">Select Tool</label_heading>
               <br />
               <input type="radio" id="tool_edit"
                      name="tool_switching" value="edit" checked>
-              <label for="tool_edit">Edit: Modify single cells in the output grid</label>
+              <label for="tool_edit"><strong>Edit</strong>: Modify single cells in the output grid</label>
               <br />
               <input type="radio" id="tool_select"
                      name="tool_switching" value="select">
-              <label for="tool_select">Select: Select multiple cells to modify</label>
+              <label for="tool_select"><strong>Select</strong>: Select multiple cells to modify</label>
               <br />
               <input type="radio" id="tool_floodfill"
                      name="tool_switching" value="floodfill">
-              <label for="tool_floodfill">Flood fill: Fill in connected areas of the same color</label>
+              <label for="tool_floodfill"><strong>Flood Fill</strong>: Fill in connected areas of the same color</label>
               <br />
             </div>
           </div>
 
-          <label_heading for="edit">Select Color</label_heading>
-              <br />
+          <label_heading for="edit" id="toolbar_heading">Select Color</label_heading>
+          <br />
           <div id="symbol_picker">
             <div id = "selected_first" class="symbol_preview symbol_0 selected" symbol="0"></div>
             <div class="symbol_preview symbol_1" symbol="1"></div>
@@ -116,7 +116,7 @@
           </div>
           
           <div id="resize_control_btns">
-            <label_heading for="edit">Grid Size</label_heading>
+            <label_heading for="edit" id="toolbar_heading">Grid Size</label_heading>
             <br />
             <!-- <label for="output_grid_size">Change grid size: </label> -->
             <label for="height">Height</label>

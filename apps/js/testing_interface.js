@@ -401,7 +401,7 @@ function verify(task) {
       }
       loadJSONTask(train, test);
       infoMsg("Loaded task training/" + task["name"]);
-      $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
+      $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Number of attempts</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
       window.taskName = task.name;
   })
   .error(function(){

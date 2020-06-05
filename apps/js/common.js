@@ -135,8 +135,9 @@ function errorMsg(msg) {
     $("#info_display").css("color", "red");
     $('#info_display').css("display", "inline");
     $('#info_display').css("opacity", "1");
+    $('#info_display').css("font-size", "16px");
     $('#info_display').html(msg);
-    $('#info_display').animate({opacity: 0}, 5000);
+    $('#info_display').animate({opacity: 0}, 10000);
 
 }
 
@@ -154,6 +155,7 @@ function infoMsg(msg) {
     $("#info_display").css("color", "green");
     $('#info_display').css("display", "inline");
     $("#info_display").css("opacity", "1");
+    $('#info_display').css("font-size", "16px");
     $('#info_display').html(msg);
-    $('#info_display').animate({opacity: 0}, 5000);
+    $('#info_display').animate({opacity: 0}, 10000);
 }

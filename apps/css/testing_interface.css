@@ -1,13 +1,15 @@
 body {
-    font-family: 'Verdana', sans-serif;
+    font-family: 'Arial', sans-serif;
     min-width: 1430px;
 }
 
 /*background used to be #d5d5d5 -- changing it to white #FFFFFF*/
 
-/*#current_task {
-    width: 500px;
-}*/
+#current_task {
+    text-align: left;
+    margin-top: 5px;
+    margin-left: 10px;
+}
 
 #workspace {
     width: 1430px;
@@ -16,20 +18,24 @@ body {
 }
 
 #demonstration_examples_view {
+    border-radius: 10px;
     float: left;
-    width: 450px;
+    width: 430px;
+    /* height: 800px; */
     margin: 10px;
-    margin-right: 5px;
+    margin-bottom: 10px;
+    /* margin-right: 5px; */
     background-color: #d5d5d5;
 }
 
 #evaluation_view {
+    border-radius: 10px;
     float: left;
-    width: 950px;
+    width: 930px;
     margin: 10px;
     margin-left: 5px;
     background-color: #d5d5d5;
-    min-height: 850px;
+    /* min-height: 850px; */
 }
 
 #evaluation-input-view {
@@ -41,8 +47,8 @@ body {
 #evaluation_output_editor {
     float: left;
     width: 500px;
-    margin: 10px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    /* margin-bottom: 10px; */
 }
 
 #parent_load_control_btns {
@@ -55,16 +61,18 @@ body {
     float: left;
     margin-top: 10px;
     margin-bottom: 0;
-    margin-left: 100px;
+    margin-left: 10px;
+    margin-right: 10px;
     background: white;
-    width: 75%;
-    padding-top: 5px;
+    width: 910px;
+    /* padding-top: 5px; */
     padding-bottom: 5px;
     align-self: center;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
     align-items: right;
+    border-radius: 6px;
 }
 
 #editor_grid_control_btns {
@@ -75,7 +83,7 @@ body {
     width: 100%;
     padding-top: 5px;
     padding-bottom: 5px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 #resize_control_btns {
@@ -87,8 +95,11 @@ body {
 #submit_solution_btn {
     color: white;
     border-radius: 4px;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
     background: rgb(28, 184, 65);
+    float: right;
+    margin-right: 10px;
+    margin-top: 0px;
 }
 
 #submit_solution_btn:active {
@@ -130,13 +141,20 @@ label_heading {
 }
 
 label {
+    /* font-weight: bold; */
     margin-left: 10px;
 }
 
 input, button {
-    /* font-size: 16px; */
+    font-size: 16px;
     margin-left: 10px;
-    /* border-radius: 2px; */
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: black;
+    /* color: white; */
+    background-color: white;
+    /* padding: 5px; */
+    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
 }
 
 #resize_btn {
@@ -146,26 +164,31 @@ input, button {
 /*Task demonstration*/
 
 .pair_preview {
-    height: 250px;
-    padding: 5px;
-    border-bottom: solid 1px #a1a1a1;
+    height: 230px;
+    padding: 10px;
+    /* border-bottom: solid 1px #a1a1a1; */
 }
+
 .input_preview {
     height: 200px;
     width: 200px;
-    float: left;
+    float: center;
+    text-align: center;
 }
+
 .output_preview {
     height: 200px;
     width: 200px;
-    float: left;
-    margin-left: 35px;
+    float: center;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .preview_block {
    height: 200px;
    width: 200px;
-   float: left; 
+   float: left;
+   margin-bottom: 60px;
 }
 
 .text {
@@ -184,17 +207,38 @@ input, button {
 }
 
 .subTextRight {
+    width: 200px;
     text-align: center;
     /* background: white; */
     padding-top: 5px;
     padding-bottom: 5px;
-    float: right;
-    margin-right: 10px;
+    /* float: right; */
+    margin-left: 10px;
 }
 
 #task_demo_header {
-    margin: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 0px;
+    border-radius: 6px;
+    font-weight: bold;
+    /* margin: 10px; */
 }
+
+#test_input_header {
+    /* margin: 10px; */
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+#test_output_header {
+    /* margin: 10px; */
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+
 
 #modal_bg {
     background-color: black;
@@ -222,4 +266,18 @@ input, button {
 br {
    display: block;
    margin: 10px 0;
+}
+
+#task_header {
+    background-color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+#info_display {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0px;
 }
