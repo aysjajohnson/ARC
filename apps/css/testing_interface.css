@@ -75,6 +75,31 @@ body {
     border-radius: 6px;
 }
 
+#write_solution {
+    float: left;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: white;
+    width: 98%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    border-radius: 6px;
+}
+
+#write_solution_box {
+    width: 98%;
+    height: 100px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    resize: none;
+}
+
 #editor_grid_control_btns {
     float: left;
     margin-top: 10px;

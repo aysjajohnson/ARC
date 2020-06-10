@@ -86,14 +86,15 @@ var numAttempts = 0;
 var numActions = 0;
 var task_index = 0;
 var maxNumAttempts = 3;
+var toolBar = document.getElementById('editor_grid_control_btns');
 var taskList = new Array();
 
 // save function
 save_data = new Array();
-function save(action = "", select_data = Array(), copy_data = Array()){
+function save(action = "", select_data = Array(), copy_data = Array(), written_sol=""){
     window.numActions ++;
     save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
-        select_data, copy_data, taskName);
+        select_data, copy_data, taskName, written_sol);
     save_data.push(save_list);
     console.log(save_data)
 }
@@ -356,6 +357,7 @@ function loadTaskFromFile(e) {
 
 function startExperiment() {
     // console.log(taskList)
+
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
     function(tasks) {
@@ -371,6 +373,12 @@ function startExperiment() {
 
 function nextTask() {
     sleep(1000).then(() => {
+        var writtenSolution = document.getElementById("write_solution_box").value;
+        save(action="write solution", select_data = Array(), copy_data = Array(), written_sol=writtenSolution);
+        document.getElementById('write_solution_box').value = " ";
+        document.getElementById('write_solution').style.display = 'none';
+        document.getElementById('submit_solution_btn').style.display = 'block';
+        document.getElementById('editor_grid_control_btns').style.display = 'block';
         var subset = "training";
         window.numAttempts = 0;
         $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
@@ -413,6 +421,12 @@ function displayInfoBar(task_index, numAttempts){
     $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
 }
 
+function submitWritten(){
+    document.getElementById('write_solution').style.display = 'block';
+    document.getElementById('submit_solution_btn').style.display = 'none';
+    document.getElementById('editor_grid_control_btns').style.display = 'none';
+}
+
 function submitSolution() {
     if (window.confirm("Are you ready to submit?")) { 
         save(action="submit")
@@ -424,7 +438,7 @@ function submitSolution() {
             numAttempts ++;
             if (numAttempts == maxNumAttempts) {
                 errorMsg('You made three errors, you will move on to the next task');
-                nextTask();
+                submitWritten();
             }
             displayInfoBar(task_index, numAttempts);
             return
@@ -437,7 +451,7 @@ function submitSolution() {
                     window.numAttempts ++;
                     if (numAttempts == maxNumAttempts) {
                         errorMsg('You made three errors, you will move on to the next task');
-                        nextTask();
+                        submitWritten();
                     }
                     displayInfoBar(task_index, numAttempts);
                     errorMsg('Wrong solution.');
@@ -676,12 +690,11 @@ $(document).ready(function () {
                 symbol = parseInt($(selected[i]).attr('symbol'));
                 COPY_PASTE_DATA.push([x, y, symbol]);
             }
-            save(copy_data = COPY_PASTE_DATA)
             infoMsg('Cells copied! Select a target cell and press V to paste at location.');
 
             // TODO: save action
             // console.log('action: copied selected cells')
-            save(action = "copied selected cells")
+            save(action = "copied selected cells", select_data = Array(), copy_data = COPY_PASTE_DATA)
         }
         if (event.which == 86) {
             // Press P
