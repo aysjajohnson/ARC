@@ -18,11 +18,25 @@
   <body>
     <div id="modal_bg">
       <div id="modal">
-        <div>Welcome to the ARC testing interface. <br /> Choose a task file to start, or click on "Random task" to load one from the ARC project on github.</div>
+        <div>Welcome to the ARC testing interface. <br /> In this experiment you will provide your best guess at solutions to image completion tasks. <br> Press Start Tutorial to begin the tutorial. <br></div>
         <br />
         <!-- <input type="file" class="load_task"/> -->
         <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
-        <button onclick="startExperiment()" id="random_task_btn">Start experiment</button>
+        <button onclick="startTutorial()" id="random_task_btn">Start Tutorial</button>
+        <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
+      </div>
+    </div>
+    <div id="tutorial_bg">
+      <div id="tutorial">
+        <div> In this experiment you will see several input and output pairs, like the ones below. Each output is some transformation of the input. <br /> Press Next to continue. </div>
+        <br />
+        <div id="input_1">
+          <img src="img/input1.png">
+          <img src='img/output1.png'>
+        </div>
+        <!-- <input type="file" class="load_task"/> -->
+        <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
+        <button onclick="startExperiment()" id="random_task_btn">Next</button>
         <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
       </div>
     </div>
@@ -86,7 +100,7 @@
               <textarea id="write_solution_box"> </textarea>
             </form>
             <br></br>
-            <button onclick="nextTask()">Submit and continue to the next task</button>
+            <button onclick="nextTask()" id="submit_description_btn">Submit and continue to the next task</button>
           </div>        
         <div id="editor_grid_control_btns">
           <div id="toolbar">

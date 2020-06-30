@@ -355,8 +355,22 @@ function loadTaskFromFile(e) {
 
 // Used in this experiment
 
+function startTutorial() {
+    document.getElementById('modal_bg').style.display = 'none';
+    document.getElementById('modal').style.display = 'none';
+    document.getElementById('tutorial_bg').style.display = 'block'
+    var img1 = document.createElement("img1");
+    img1.src = "img/input1.png";
+    var src = document.getElementById("tutorial_bg");
+    src.appendChild(img1);
+    
+    document.getElementById('tutorial').style.display = 'block'
+}
+
+
 function startExperiment() {
     // console.log(taskList)
+
 
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
@@ -365,6 +379,12 @@ function startExperiment() {
       window.taskName = task.name;
       window.prevTask = task["name"];
       verify(task);
+      document.getElementById('tutorial_bg').style.display = 'none'
+      document.getElementById('tutorial').style.display = 'none'
+      // document.getElementById('evaluation_view').style.display = 'none';
+      // document.getElementById('demonstration_examples_view').style.display = 'none';
+
+
     })
     .error(function(){
       errorMsg('Error loading task list');
@@ -374,27 +394,31 @@ function startExperiment() {
 function nextTask() {
     sleep(1000).then(() => {
         var writtenSolution = document.getElementById("write_solution_box").value;
-        save(action="write solution", select_data = Array(), copy_data = Array(), written_sol=writtenSolution);
-        document.getElementById('write_solution_box').value = " ";
-        document.getElementById('write_solution').style.display = 'none';
-        document.getElementById('submit_solution_btn').style.display = 'block';
-        document.getElementById('editor_grid_control_btns').style.display = 'block';
-        var subset = "training";
-        window.numAttempts = 0;
-        $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
-            function(tasks) {
-            window.task_index ++; 
-            var task = tasks[taskList[task_index][1]];
-            verify(task);
-        })
-        .error(function(){
-          errorMsg('Error loading task list');
-        });
-
-        if (task_index == 10) {
-            errorMsg('This is the last task')
+        if (writtenSolution == " ") {
+            errorMsg('Nothing to submit')
         }
+        else {
+            save(action="write solution", select_data = Array(), copy_data = Array(), written_sol=writtenSolution);
+            document.getElementById('write_solution_box').value = " ";
+            document.getElementById('write_solution').style.display = 'none';
+            document.getElementById('submit_solution_btn').style.display = 'block';
+            document.getElementById('editor_grid_control_btns').style.display = 'block';
+            var subset = "training";
+            window.numAttempts = 0;
+            $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
+                function(tasks) {
+                window.task_index ++; 
+                var task = tasks[taskList[task_index][1]];
+                verify(task);
+            })
+            .error(function(){
+              errorMsg('Error loading task list');
+            });
 
+            if (task_index == 10) {
+                errorMsg('This is the last task')
+            }
+        }
     })   
 }
 
@@ -434,7 +458,8 @@ function submitSolution() {
         reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
         submitted_output = CURRENT_OUTPUT_GRID.grid;
         if (reference_output.length !== submitted_output.length) {
-            errorMsg('Wrong shape.');
+            errorMsg('Wrong solution.');
+            // errorMsg('Wrong shape.');
             numAttempts ++;
             if (numAttempts == maxNumAttempts) {
                 errorMsg('You made three errors, you will move on to the next task');

@@ -133,6 +133,17 @@ body {
 
 button:focus {outline:0;}
 
+#submit_description_btn {
+    color: white;
+    border-radius: 4px;
+    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
+    background: rgb(28, 184, 65);
+    float: center;
+    margin-right: 10px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
 #output_grid {
 
 }
@@ -263,6 +274,9 @@ input, button {
     font-weight: bold;
 }
 
+#input_1{
+    align-content: center;
+}
 
 
 #modal_bg {
@@ -283,6 +297,28 @@ input, button {
     width: 500px;
     margin-top: 100px;
 }
+
+#tutorial_bg {
+    display: none;
+    background-color: white;
+    width: 100%;
+    min-height: 10000px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+#tutorial {
+    display: none;
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+    width: 500px;
+    margin-top: 50px;
+}
+
 
 #modal input {
     margin-left: 70px;
