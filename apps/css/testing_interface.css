@@ -274,8 +274,36 @@ input, button {
     font-weight: bold;
 }
 
-#input_1{
-    align-content: center;
+#computer_arrow{
+    display: inline-block;
+}
+
+
+#arrow_inner{
+    position: relative;
+    margin-bottom: 20px;
+}
+
+#tutorial_pair{
+    text-align: center;
+}
+
+#tutorial_text {
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+    width: 500px;
+    margin-top: 50px;
+}
+
+#tutorial_video {
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+    width: 500px;
+    margin-top: 50px;
 }
 
 

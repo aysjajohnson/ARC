@@ -26,9 +26,11 @@ $(document).ready(function () {
 });
 
 // Experiment grids
-var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
-    '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
-    '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+// var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
+//     '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
+//     '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+
+var grids = Array('00d62c1b.json')
 
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
@@ -363,7 +365,7 @@ function startTutorial() {
     img1.src = "img/input1.png";
     var src = document.getElementById("tutorial_bg");
     src.appendChild(img1);
-    
+
     document.getElementById('tutorial').style.display = 'block'
 }
 

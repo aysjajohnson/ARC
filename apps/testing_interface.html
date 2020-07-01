@@ -28,17 +28,89 @@
     </div>
     <div id="tutorial_bg">
       <div id="tutorial">
-        <div> In this experiment you will see several input and output pairs, like the ones below. Each output is some transformation of the input. <br /> Press Next to continue. </div>
-        <br />
-        <div id="input_1">
-          <img src="img/input1.png">
-          <img src='img/output1.png'>
+        <div> In this experiment you will see several input and output pairs, like the ones below. Each output is some transformation of the input. You can think of it like a computer program applying to the input to produce the output. <br /> </div>
+        <br /><br><br>
+      </div>
+      <div id="tutorial_pair">
+        <img src="img/input1.png" width="200" height="200">
+        <div id="computer_arrow">
+          <div id="comp">
+            <img src="img/comp.png" id="comp_inner" width="125" height="125">
+          </div>
+          <div id="arrow">
+            <img src="img/arrow.png" id="arrow_inner" width="100" height="50">
+          </div>
         </div>
+        <img src='img/output1.png' width="200" height="200">
+      </div>
+      <br><br>
+
+      <div id="tutorial_pair">
+        <img src="img/input2.png" width="200" height="200">
+        <div id="computer_arrow">
+          <div id="comp">
+            <img src="img/comp.png" id="comp_inner" width="125" height="125">
+          </div>
+          <div id="arrow">
+            <img src="img/arrow.png" id="arrow_inner" width="100" height="50">
+          </div>
+        </div>
+        <img src='img/output2.png' width="200" height="200">
+      </div>
+
+
+      <div id="tutorial_text">
+        <div> You will then see a test input and blank output. You should fill in the test output with your best guess at the program that completes the pattern. We will explain how to do this below. <br /> </div>
+        <br /><br>
+      </div>
+
+      <div id="tutorial_pair">
+        <img src="img/test.png" width="200" height="200">
+        <div id="computer_arrow">
+          <div id="comp">
+            <img src="img/comp.png" id="comp_inner" width="125" height="125">
+          </div>
+          <div id="arrow">
+            <img src="img/arrow.png" id="arrow_inner" width="100" height="50">
+          </div>
+        </div>
+        <img src='img/test_output.png' width="200" height="200">
+      </div>
+
+      <div id="tutorial_text">
+        <div> In this case the correct program was one that fills in all contiguous areas of green with yellow. So the correct output would be: <br /> </div>
+        <br /><br>
+      </div>
+
+      <div id="tutorial_pair">
+        <img src="img/test_correct.png" width="200" height="200">
+      </div>
+
+      <div id="tutorial_text">
+        <div> Below is the interface you will be using. We will provide some videos on how to use each feature of the interface. <br /> </div>
+        <br /><br>
+      </div>
+
+      <div id="tutorial_pair">
+        <img src="img/interface.png" width="1000" height="600">
+      </div>
+
+      <div id="tutorial_text">
+        <div> These video will show you the basic functionality of each of the tools in the interface. The first one demonstrates how to change the size of the grid, and then how to reset it back to it's original shape. It will always start as a 3x3 blank grid. <br /> </div>
+        <br />
+      </div>
+
+      <div id="tutorial_video">
+        <video controls>  <source src="img/h_w_reset.mp4" type="video/mp4"></video>
+      </div>
+
+
+
         <!-- <input type="file" class="load_task"/> -->
         <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
-        <button onclick="startExperiment()" id="random_task_btn">Next</button>
+        <button onclick="startExperiment()" id="random_task_btn">Begin Experiment</button>
         <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
-      </div>
+      
     </div>
     <div id="workspace">
 
