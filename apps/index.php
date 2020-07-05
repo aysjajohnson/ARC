@@ -1,2 +1,1 @@
-#!/usr/bin/php
-<?php include_once("testing_interface.html"); ?>
+<?php include_once("home.html"); ?>
