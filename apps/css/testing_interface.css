@@ -11,6 +11,12 @@ body {
     margin-left: 10px;
 }
 
+#tutorial_workspace {
+    width: 1430px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #workspace {
     width: 1430px;
     margin-left: auto;
@@ -293,7 +299,7 @@ input, button {
     background-color: white;
     text-align: center;
     vertical-align: top;
-    width: 500px;
+    width: 650px;
     margin-top: 50px;
 }
 
@@ -302,7 +308,7 @@ input, button {
     background-color: white;
     text-align: center;
     vertical-align: top;
-    width: 500px;
+/*    width: 500px;*/
     margin-top: 50px;
 }
 

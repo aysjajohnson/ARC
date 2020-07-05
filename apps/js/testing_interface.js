@@ -26,11 +26,14 @@ $(document).ready(function () {
 });
 
 // Experiment grids
-// var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
-//     '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
-//     '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
+    '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
+    '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
 
-var grids = Array('00d62c1b.json')
+var tutorial_grid = Array('00d62c1b.json')
+
+var taskList = new Array();
+var tutorial_task = new Array();
 
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
@@ -73,7 +76,14 @@ $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training
         }
     }
     shuffle(taskList)
-    // taskList.push(tasks);
+});
+
+$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+    for (i=0; i<tasks.length; i++) {
+        if (tutorial_grid.includes(tasks[i].name)) {
+            tutorial_task.push([tasks[i],i]);
+        }
+    }
 });
 
 // sleep function
@@ -89,7 +99,6 @@ var numActions = 0;
 var task_index = 0;
 var maxNumAttempts = 3;
 var toolBar = document.getElementById('editor_grid_control_btns');
-var taskList = new Array();
 
 // save function
 save_data = new Array();
@@ -360,38 +369,41 @@ function loadTaskFromFile(e) {
 function startTutorial() {
     document.getElementById('modal_bg').style.display = 'none';
     document.getElementById('modal').style.display = 'none';
-    document.getElementById('tutorial_bg').style.display = 'block'
-    var img1 = document.createElement("img1");
-    img1.src = "img/input1.png";
-    var src = document.getElementById("tutorial_bg");
-    src.appendChild(img1);
+    document.getElementById('tutorial_bg').style.display = 'block';
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+    function(tasks) {
+      var task = tasks[tutorial_task[0][1]];
+      verify(task); })
+    document.getElementById('workspace').style.display = 'none';
 
-    document.getElementById('tutorial').style.display = 'block'
+    // document.getElementById('tutorial').style.display = 'block'
 }
 
 
 function startExperiment() {
-    // console.log(taskList)
-
-
+    sleep(1000).then(() => {
+        document.getElementById('workspace').style.display = 'block';
+        document.getElementById('tutorial_bg').style.display = 'none';
+      })
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-    function(tasks) {
+      function(tasks) {
       var task = tasks[taskList[0][1]];
       window.taskName = task.name;
       window.prevTask = task["name"];
-      verify(task);
-      document.getElementById('tutorial_bg').style.display = 'none'
-      document.getElementById('tutorial').style.display = 'none'
-      // document.getElementById('evaluation_view').style.display = 'none';
-      // document.getElementById('demonstration_examples_view').style.display = 'none';
-
-
+      sleep(1000).then(() => {
+        verify(task);
+        console.log(task);
+      })
     })
+
     .error(function(){
       errorMsg('Error loading task list');
     });
 }
+
+
 
 function nextTask() {
     sleep(1000).then(() => {
@@ -453,6 +465,44 @@ function submitWritten(){
     document.getElementById('editor_grid_control_btns').style.display = 'none';
 }
 
+function submitSolution_tutorial() {
+    if (window.confirm("Are you ready to submit?")) { 
+        syncFromEditionGridToDataGrid();
+        reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+        submitted_output = CURRENT_OUTPUT_GRID.grid;
+        if (reference_output.length !== submitted_output.length) {
+            errorMsg('Wrong solution.');
+            // errorMsg('Wrong shape.');
+            numAttempts ++;
+            if (numAttempts == maxNumAttempts) {
+                document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
+            }
+            displayInfoBar(task_index, numAttempts);
+            return
+        }
+
+        for (var i = 0; i < reference_output.length; i++){
+            ref_row = reference_output[i];
+            for (var j = 0; j < ref_row.length; j++){
+                if (ref_row[j] !== submitted_output[i][j]) {
+                    window.numAttempts ++;
+                    if (numAttempts == maxNumAttempts) {
+                        document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
+                    }
+                    displayInfoBar(task_index, numAttempts);
+                    errorMsg('Wrong solution.');
+                    // displayNumAttempts(numAttempts);
+                    return
+                }
+            }
+
+        }
+        window.numAttempts++;
+        infoMsg('Correct solution!');
+        submitWritten();
+    }
+}
+
 function submitSolution() {
     if (window.confirm("Are you ready to submit?")) { 
         save(action="submit")
@@ -491,7 +541,7 @@ function submitSolution() {
         window.numAttempts++;
         // displayNumAttempts(numAttempts);
         infoMsg('Correct solution!');
-        nextTask();
+        submitWritten();
     }
 }
     
