@@ -18,7 +18,7 @@
   <body>
     <div id="modal_bg">
       <div id="modal">
-        <div>Welcome to the ARC testing interface. <br /> In this experiment you will provide your best guess at solutions to image completion tasks. <br> Press Start Tutorial to begin the tutorial. <br></div>
+        <div>Welcome to the ARC testing interface. <br /> In this experiment you will provide your best guess at solutions to image completion tasks. <br> <br> Press Start Tutorial to begin the tutorial. <br></div>
         <br />
         <!-- <input type="file" class="load_task"/> -->
         <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
@@ -83,7 +83,7 @@
       </div>
 
       <div id="tutorial_text">
-        <div> In this case the correct program was one that fills in all contiguous areas of green with yellow. So the correct output would be: <br /> </div>
+        <div> In this case the correct program was one that fills in all connected green areas with yellow. So the correct output would be: <br /> </div>
         <br /><br>
       </div>
 
@@ -101,54 +101,49 @@
       </div>
 
       <div id="tutorial_text">
-        <div> These videos will show you the basic functionality of each of the tools in the interface. The video below demonstrates how to change the size of the grid and then how to reset it back to it's original shape. It will always start as a 3x3 blank grid. <br /> </div>
-        <br />
+        <div> The videos below will demonstrate the basic functionality of each of the tools in the interface. <br> <br> The video below demonstrates how to <strong> change the size of the grid </strong> and how to <strong> reset it back to it's original shape.</strong> It will always start as a 3x3 blank grid. <br /> </div>
       </div>
 
       <div id="tutorial_video">
-        <video controls>  <source src="img/h_w_reset_mouse.mp4" type="video/mp4"></video>
+        <img src="img/h-w-reset-mouse.gif" />
       </div>
 
       <div id="tutorial_text">
-        <div> The video below demonstrates how to copy the input image and then how to use the edit tool. When editing, you can modify single cells in the output grid. <br /> </div>
-        <br />
+        <div> The video below demonstrates how to <strong> copy the input image </strong> and how to use the <strong> edit tool.</strong> When editing, you can modify single cells in the output grid. <br /> </div>
       </div>
 
       <div id="tutorial_video">
-        <video controls>  <source src="img/copy_from_input_edit.mp4" type="video/mp4"></video>
+        <img src="img/copy-from-input-edit.gif" />
       </div>
 
 
       <div id="tutorial_text">
-        <div> The video below demonstrates how to use the select and flood fill tools. Using select will allow you to highlight sections of the grid to fill in with a specific color. The flood fill tool will fill in connected areas with the color you choose. <br /> </div>
-        <br />
+        <div> The video below demonstrates how to use the <strong> select and flood fill tools.</strong> Using select will allow you to highlight sections of the grid to fill in with a specific color. The flood fill tool will fill in connected areas with the color you choose. <br /> </div>
       </div>
 
       <div id="tutorial_video">
-        <video controls>  <source src="img/select_flood_fill.mp4" type="video/mp4"></video>
+        <img src="img/select-flood-fill.gif" />
       </div>
 
 
       <div id="tutorial_text">
-        <div> The video below demonstrates how to copy and paste patterns from the input grid to the output grid. To do so you would first select the select tool, then highlight the portion of the input grid you're interested in, copy it with ctrl + c, and then paste it onto the output grid with ctrl + v. <br /> </div>
-        <br />
+        <div> The video below demonstrates how to <strong> copy and paste </strong>patterns from the input grid to the output grid. To do so you would first select the select tool, then highlight the portion of the input grid you're interested in, copy it with ctrl + c, and then paste it onto the output grid with ctrl + v. <br /> </div>
       </div>
 
       <div id="tutorial_video">
-        <video controls>  <source src="img/ctrl_c.mp4" type="video/mp4"></video>
+        <img src="img/ctrl-c.gif" />
       </div>
 
       <div id="tutorial_text">
-        <div> The video below demonstrates the writing portion of the experiment. Once you submit either the correct answer or three incorrect answers, you will be asked to submit a short written description of your best guess at the rule that transforms the inputs to the outputs. You will then move onto the next task. <br> <br> There are ten tasks in total. You can view which task you are on and how many attempts you have used in the top bar. This area will also display whether or not your solution is correct. <br /> </div>
-        <br />
+        <div> The video below demonstrates how to do the <strong> writing portion of the experiment.</strong> Once you submit either the correct answer or three incorrect answers, you will be asked to submit a short written description of your best guess at the rule that transforms the inputs to the outputs. You will then move onto the next task. <br> <br> There are ten tasks in total. You can view which task you are on and how many attempts you have used in the top bar. This area will also display whether or not your solution is correct. <br /> </div>
       </div>
 
       <div id="tutorial_video">
-        <video controls>  <source src="img/submit_solution.mp4" type="video/mp4"></video>
+        <img src="img/submit-solution.gif" />
       </div>
 
       <div id="tutorial_text">
-        <div> Now that you have the tools neccessary, please complete the task below. You will only be able to move onto the next stage if you do it correctly. If you submit the incorrect grid three times in a row, you will not be able to do the experiment. You have unlimited time to do so, nothing in this experiment is timed. <br /> </div>
+        <div> Now that you have the tools neccessary, please complete the task below. You will only be able to move onto the next stage if you do it correctly. If you submit the incorrect grid three times in a row, you will not be able to do the experiment. You have unlimited time to do so. <br /> </div>
         <br />
       </div>
       
@@ -208,7 +203,8 @@
               <textarea id="write_solution_box"> </textarea>
             </form>
             <br></br>
-            <button onclick="startExperiment()" id="submit_description_btn">Submit and begin the experiment</button>
+            <!-- <button onclick="startExperiment()" id="submit_description_btn">Submit and begin the experiment</button> -->
+            <button onclick="checkUnderstanding()" id="submit_description_btn">Submit</button>
           </div>        
         <div id="editor_grid_control_btns">
           <div id="toolbar">
@@ -312,116 +308,40 @@
     </div>
   </div>
 </div> 
-<!--   <button onclick="startExperiment()" id="random_task_btn">Begin Experiment</button> -->
+</div>
 </div>
 
+<div id="check_understanding">
 
+  <div id="tutorial_text">
+    <div> <strong> Answer the following questions correctly to move onto the experiment. </strong></div>
+  </div>
 
+  <div id="tutorial_text">
+    <div> Are any of the tasks timed? </div>
 
+    <form>
+    <div>
+      <input type="radio" id="yes1" name="y/n" value="yes"
+             checked>
+      <label for="yes1">Yes</label>
 
-
-
-
-<!--   <div id="workspace">
-
-      <div id="demonstration_examples_view">
-        <div class="text" id="task_demo_header">Task demonstration</div>
-      <div id="task_preview"></div>
+      <input type="radio" id="no1" name="y/n" value="no">
+      <label for="no1">No</label>
     </div>
+  </form>
+  </div>
 
-    <div id="evaluation_view">
-      <div id="parent_load_task_control_btns">
-        <div id="load_task_control_btns">
-            <div class="text" id="current_task">
-              <span></span>
-              <button onclick="submitSolution()" id="submit_solution_btn">Submit</button>
-            <div id="info_display"></div>
-            </div>
-          </div>
-        </div>
-      <div id="evaluation-input-view">
-        <div class="text" id="test_input_header">Test Input
-        </div>
+  <div id="tutorial_text">
+    <div> How many attempts do you have before you will be moved onto the next task? </div>
 
-        <div id="evaluation_input" class="selectable_grid"></div>
-    </div>
-
-    <div id="evaluation_output_editor">
-      <div class="text" id="test_output_header">Test Output
-      </div>        
-      <div id="output_grid">
-        <div class="edition_grid selectable_grid">
-          <div class="row">
-            <div class="cell" symbol="0" x="0" y="0"></div>
-            <div class="cell" symbol="0" x="0" y="1"></div>
-            <div class="cell" symbol="0" x="0" y="2"></div>
-          </div>
-          <div class="row">
-            <div class="cell" symbol="0" x="1" y="0"></div>
-            <div class="cell" symbol="0" x="1" y="1"></div>
-            <div class="cell" symbol="0" x="1" y="2"></div>
-          </div>
-          <div class="row">
-            <div class="cell" symbol="0" x="2" y="0"></div>
-            <div class="cell" symbol="0" x="2" y="1"></div>
-            <div class="cell" symbol="0" x="2" y="2"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="edition_view">
-        <div id="write_solution" style="display: none">
-          <p><strong>Briefly describe your solution for this task: </strong></p>
-            <form >
-              <textarea id="write_solution_box"> </textarea>
-            </form>
-            <br></br>
-            <button onclick="nextTask()" id="submit_description_btn">Submit and continue to the next task</button>
-          </div>        
-        <div id="editor_grid_control_btns">
-          <div id="toolbar">
-            <div>
-              <label_heading for="edit" id="toolbar_heading">Select Tool</label_heading>
-              <br />
-              <input type="radio" id="tool_edit"
-                     name="tool_switching" value="edit" checked>
-              <label for="tool_edit"><strong>Edit</strong>: Modify single cells in the output grid</label>
-              <br />
-              <input type="radio" id="tool_select"
-                     name="tool_switching" value="select">
-              <label for="tool_select"><strong>Select</strong>: Select multiple cells to modify</label>
-              <br />
-              <input type="radio" id="tool_floodfill"
-                     name="tool_switching" value="floodfill">
-              <label for="tool_floodfill"><strong>Flood Fill</strong>: Fill in connected areas of the same color</label>
-              <br />
-            </div>
-          </div>
-
-          <label_heading for="edit" id="toolbar_heading">Select Color</label_heading>
-          <br />
-          <div id="symbol_picker">
-            <div id = "selected_first" class="symbol_preview symbol_0 selected" symbol="0"></div>
-            <div class="symbol_preview symbol_1" symbol="1"></div>
-            <div class="symbol_preview symbol_2" symbol="2"></div>
-            <div class="symbol_preview symbol_3" symbol="3"></div>
-            <div class="symbol_preview symbol_4" symbol="4"></div>
-            <div class="symbol_preview symbol_5" symbol="5"></div>
-            <div class="symbol_preview symbol_6" symbol="6"></div>
-            <div class="symbol_preview symbol_7" symbol="7"></div>
-            <div class="symbol_preview symbol_8" symbol="8"></div>
-            <div class="symbol_preview symbol_9" symbol="9"></div>
-          </div>
-          
-          <div id="resize_control_btns">
-            <label_heading for="edit" id="toolbar_heading">Grid Size</label_heading>
-            <br />
-            <!-- <label for="output_grid_size">Change grid size: </label> -->
-            <label for="height">Height</label>
-            <select id="height">
-              <option value="1">1</option>
+    <div>
+      <br>
+      <label for="attempts_question">Number of attempts:</label>
+            <select id="attempts_question">
+              <option value="1"Selected>1</option>
               <option value="2">2</option>
-              <option value="3"Selected>3</option>
+              <option value="3">3</option>
               <option value="4">4</option>
               <option value="5">5</option>
               <option value="6">6</option>
@@ -429,78 +349,47 @@
               <option value="8">8</option>
               <option value="9">9</option>
               <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="22">21</option>
-              <option value="23">23</option>
-              <option value="24">24</option>
-              <option value="25">25</option>
             </select>
-            <label for="width">Width</label>
-            <select id="width">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3"Selected>3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="22">21</option>
-              <option value="23">23</option>
-              <option value="24">24</option>
-              <option value="25">25</option>
-            </select>
-            <!-- <button onclick="resizeOutputGrid()" id="resize_btn">Resize</button> -->
-          </div>
+    </div>
+  </div>
 
-          <button onclick="copyFromInput()">Copy from input</button>
-          <button onclick="resetOutputGrid()">Reset grid</button>
-          <!-- <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button> -->
-        </div>
-        
-        <!-- <div id="load_task_control_btns"> -->
-          <!-- <label for="load_task_file_input">Load task JSON: </label> -->
-          <!-- <input type="file" id="load_task_file_input" class="load_task"/> -->
-          <!-- <br></br> -->
-          <!-- <label id="current_task">Current task: </label>
-          <br></br> -->
-          <!-- <button onclick="previousTask()" id="prev_task_btn">Previous task</button> -->
-          <!-- <button onclick="nextTask()" id="next_task_btn">Next task</button> -->
-          <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
-        <!-- </div> -->
-      </div>
-      
-      <!-- <div id="num_attempts">Number of attempts: 0</div> -->
 
-      <!-- <div id="error_display"></div> -->
-      <!-- <div id="info_display"></div> -->
+  <div id="tutorial_text">
+    <div> How many tasks are there? </div>
 
-      
+    <div>
+      <br>
+      <label for="tasks_question">Number of tasks:</label>
+          <select id="tasks_question">
+            <option value="1"Selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
     </div>
 
-    
+  </div>
+<div id="tutorial_text">
+  <button onclick="evalAnswers()" id="random_task_btn">Submit</button>
 </div>
-</div> -->
+
+<div id="incorrect_submission">
+  <div> One or more answers were incorrect, please try again. </div>
+</div> 
+
+</div> 
+
+<div id="last_page">
+  <div id="tutorial_text">
+    <div> <strong> Congratulations, you have completed the experiment! </strong></div>
+  </div>
+</div>
+
 </body>
 </html>

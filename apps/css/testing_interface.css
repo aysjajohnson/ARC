@@ -187,6 +187,20 @@ label {
     margin-left: 10px;
 }
 
+#check_understanding {
+}
+
+#incorrect_submission {
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+    width: 650px;
+    margin-top: 50px;
+    color: red;
+    visibility: hidden;
+}
+
 input, button {
     font-size: 16px;
     margin-left: 10px;
