@@ -26,9 +26,13 @@ $(document).ready(function () {
 });
 
 // Experiment grids
-var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
-    '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
-    '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+// var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
+//     '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
+//     '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+
+var grids = Array('1caeab9d.json','1e0a9b12.json','1f876c06.json','1fad071e.json',
+    '3af2c5a8.json','6c434453.json','6e82a1ae.json','7c008303.json',
+    '7fe24cdd.json','8be77c9e.json')
 
 var tutorial_grid = Array('00d62c1b.json')
 
