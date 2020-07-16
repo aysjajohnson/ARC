@@ -256,6 +256,9 @@ function resetOutputGrid() {
     // set initial tool to be edit
     document.getElementById("tool_edit").checked = true;
 
+    // clear clipboard
+    COPY_PASTE_DATA = [];
+    
     // TODO: save action
     // console.log('action: reset grid');
     save(action="reset grid")
