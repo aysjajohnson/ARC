@@ -20,7 +20,7 @@ $(document).ready(function () {
         resizeOutputGrid()
         save(action = "changed width");
     });
-    
+
     // automatically load a random task
     // randomTask();
 });
@@ -106,10 +106,18 @@ var toolBar = document.getElementById('editor_grid_control_btns');
 
 // save function
 save_data = new Array();
-function save(action = "", select_data = Array(), copy_data = Array(), written_sol=""){
+function save(action = "", select_data = Array(), copy_data = Array(), written_sol="") {
     window.numActions ++;
-    save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
-        select_data, copy_data, taskName, written_sol);
+
+    // get current date and time
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    
+    save_list = new Array(numActions, action, output_to_string(),
+                          selected_tool(), getSelectedSymbol(),get_size(),
+                          select_data, copy_data, taskName, written_sol, dateTime);
     save_data.push(save_list);
     console.log(save_data)
 }
