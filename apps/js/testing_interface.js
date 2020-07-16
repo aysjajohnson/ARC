@@ -300,7 +300,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqInputGrid.length) {
         jqInputGrid = $('<div class="input_preview"></div>');
         // Adding a header to each input/ouput pair in demonstration
-        var name = $('<div class="subTextLeft" id="task_header">Train Input ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextLeft" id="task_header">Example Input ' + (pairId+1) + '</div>');
         var leftGrid = $('<div id = "left_block_' + pairId + '" class="preview_block"></div>');
         leftGrid.appendTo(pairSlot)
         name.appendTo(leftGrid);
@@ -310,7 +310,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqOutputGrid.length) {
         jqOutputGrid = $('<div class="output_preview"></div>');
         // jqOutputGrid.appendTo(pairSlot);
-        var name = $('<div class="subTextRight" id="task_header">Train Output ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextRight" id="task_header">Example Output ' + (pairId+1) + '</div>');
         var rightGrid = $('<div id = "right_block_' + pairId + '" class="preview_block"></div>');
         rightGrid.appendTo(pairSlot)
         name.appendTo(rightGrid);
