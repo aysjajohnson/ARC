@@ -517,7 +517,9 @@ function verify(task) {
 }
 
 function displayInfoBar(task_index, numAttempts){
-    $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
+      $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Number of attempts</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+    
+    // $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
 }
 
 function submitWritten(){
@@ -734,7 +736,7 @@ function initializeSelectable() {
     }
     toolMode = $('input[name=tool_switching]:checked').val();
     if (toolMode == 'select') {
-        infoMsg('Select some cells and click on a color to fill in, or press C to copy');
+        infoMsg('Select some cells and either click on a color to change all selected cells to that color, or press C to copy selected cells');
         $('.selectable_grid').selectable(
             {
                 autoRefresh: false,
