@@ -20,7 +20,7 @@ $(document).ready(function () {
         resizeOutputGrid()
         save(action = "changed width");
     });
-    
+
     // automatically load a random task
     // randomTask();
 });
@@ -106,10 +106,18 @@ var toolBar = document.getElementById('editor_grid_control_btns');
 
 // save function
 save_data = new Array();
-function save(action = "", select_data = Array(), copy_data = Array(), written_sol=""){
+function save(action = "", select_data = Array(), copy_data = Array(), written_sol="") {
     window.numActions ++;
-    save_list = new Array(numActions, action, output_to_string(), selected_tool(), getSelectedSymbol(),get_size(),
-        select_data, copy_data, taskName, written_sol);
+
+    // get current date and time
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    
+    save_list = new Array(numActions, action, output_to_string(),
+                          selected_tool(), getSelectedSymbol(),get_size(),
+                          select_data, copy_data, taskName, written_sol, dateTime);
     save_data.push(save_list);
     console.log(save_data)
 }
@@ -256,6 +264,9 @@ function resetOutputGrid() {
     // set initial tool to be edit
     document.getElementById("tool_edit").checked = true;
 
+    // clear clipboard
+    COPY_PASTE_DATA = [];
+    
     // TODO: save action
     // console.log('action: reset grid');
     save(action="reset grid")
@@ -289,7 +300,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqInputGrid.length) {
         jqInputGrid = $('<div class="input_preview"></div>');
         // Adding a header to each input/ouput pair in demonstration
-        var name = $('<div class="subTextLeft" id="task_header">Train Input ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextLeft" id="task_header">Example Input ' + (pairId+1) + '</div>');
         var leftGrid = $('<div id = "left_block_' + pairId + '" class="preview_block"></div>');
         leftGrid.appendTo(pairSlot)
         name.appendTo(leftGrid);
@@ -299,7 +310,7 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
     if (!jqOutputGrid.length) {
         jqOutputGrid = $('<div class="output_preview"></div>');
         // jqOutputGrid.appendTo(pairSlot);
-        var name = $('<div class="subTextRight" id="task_header">Train Output ' + (pairId+1) + '</div>');
+        var name = $('<div class="subTextRight" id="task_header">Example Output ' + (pairId+1) + '</div>');
         var rightGrid = $('<div id = "right_block_' + pairId + '" class="preview_block"></div>');
         rightGrid.appendTo(pairSlot)
         name.appendTo(rightGrid);
@@ -506,7 +517,9 @@ function verify(task) {
 }
 
 function displayInfoBar(task_index, numAttempts){
-    $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
+      $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Number of attempts</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+    
+    // $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
 }
 
 function submitWritten(){
@@ -723,7 +736,7 @@ function initializeSelectable() {
     }
     toolMode = $('input[name=tool_switching]:checked').val();
     if (toolMode == 'select') {
-        infoMsg('Select some cells and click on a color to fill in, or press C to copy');
+        infoMsg('Select some cells and either click on a color to change all selected cells to that color, or press C to copy selected cells');
         $('.selectable_grid').selectable(
             {
                 autoRefresh: false,

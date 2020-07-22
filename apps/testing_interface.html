@@ -18,11 +18,11 @@
   <body>
     <div id="modal_bg">
       <div id="modal">
-        <div>Welcome to the ARC testing interface. <br /> In this experiment you will provide your best guess at solutions to image completion tasks. <br> <br> Press Start Tutorial to begin the tutorial. <br></div>
+        <div>Welcome to the ARC testing interface. In this experiment, you will complete a series of abstract reasoning puzzles. Press the Start button to begin the tutorial. <br></div>
         <br />
         <!-- <input type="file" class="load_task"/> -->
         <!-- <button onclick="firstTask()" id="random_task_btn">First task</button> -->
-        <button onclick="startTutorial()" id="random_task_btn">Start Tutorial</button>
+        <button onclick="startTutorial()" id="random_task_btn">Start</button>
         <!-- <button onclick="randomTask()" id="random_task_btn">Random task</button> -->
       </div>
     </div>
@@ -149,12 +149,10 @@
       
     </div>
 
-
-
     <div id="workspace">
 
       <div id="demonstration_examples_view">
-        <div class="text" id="task_demo_header">Task demonstration</div>
+        <div class="text" id="task_demo_header">Task Demonstration</div>
       <div id="task_preview"></div>
     </div>
 
@@ -163,7 +161,7 @@
         <div id="load_task_control_btns">
             <div class="text" id="current_task">
               <span></span>
-              <button onclick="submitSolution_tutorial()" id="submit_solution_btn">Submit</button>
+              <!-- <button onclick="submitSolution_tutorial()" id="submit_solution_btn">Submit</button> -->
             <div id="info_display"></div>
             </div>
           </div>
@@ -303,6 +301,7 @@
 
           <button onclick="copyFromInput()">Copy from input</button>
           <button onclick="resetOutputGrid()">Reset grid</button>
+          <button onclick="submitSolution_tutorial()" id="submit_solution_btn">Submit</button>
         </div>
       </div> 
     </div>
