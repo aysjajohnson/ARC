@@ -330,7 +330,7 @@ input, button {
 #modal_bg {
     background-color: black;
     width: 100%;
-    min-height: 10000px;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
@@ -350,7 +350,7 @@ input, button {
     display: none;
     background-color: white;
     width: 100%;
-    min-height: 10000px;
+    /* min-height: 10000px; */
     position: absolute;
     top: 0;
     left: 0;

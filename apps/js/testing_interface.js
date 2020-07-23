@@ -7,34 +7,40 @@ $(document).ready(function () {
     // };
 
     // add things to detect if height or width are resized
-    $('#height').change(function() {
-        // console.log('action: changed height of output grid to ' +
-        //            $('#height').val());
+    $("#height").change(function() {
+        // console.log("action: changed height of output grid to " +
+        //            $("#height").val());
         resizeOutputGrid()
         save(action = "changed height");
     });
 
-    $('#width').change(function() {
-        // console.log('action: changed width of output grid to ' +
-        //            $('#width').val());
+    $("#width").change(function() {
+        // console.log("action: changed width of output grid to " +
+        //            $("#width").val());
         resizeOutputGrid()
         save(action = "changed width");
     });
 
     // automatically load a random task
     // randomTask();
+
+    // hide certain elements
+    $('#tutorial_bg').hide()
+    $('#tutorial_quiz').hide()
+    $('#eval_tutorial_btn').hide();
+    $('#last_page').hide();
 });
 
 // Experiment grids
-// var grids = Array('a699fb00.json', '23581191.json', 'f9012d9b.json', 
-//     '4258a5f9.json', 'bdad9b1f.json', '8403a5d5.json', '6e19193c.json', 
-//     '77fdfe62.json', 'd037b0a7.json', '93b581b8.json');
+// var grids = Array("a699fb00.json", "23581191.json", "f9012d9b.json", 
+//     "4258a5f9.json", "bdad9b1f.json", "8403a5d5.json", "6e19193c.json", 
+//     "77fdfe62.json", "d037b0a7.json", "93b581b8.json");
 
-var grids = Array('1caeab9d.json','1e0a9b12.json','1f876c06.json','1fad071e.json',
-    '3af2c5a8.json','6c434453.json','6e82a1ae.json','7c008303.json',
-    '7fe24cdd.json','8be77c9e.json')
+var grids = Array("1caeab9d.json","1e0a9b12.json","1f876c06.json","1fad071e.json",
+                  "3af2c5a8.json","6c434453.json","6e82a1ae.json","7c008303.json",
+                  "7fe24cdd.json","8be77c9e.json")
 
-var tutorial_grid = Array('00d62c1b.json')
+var tutorial_grid = Array("00d62c1b.json")
 
 var taskList = new Array();
 var tutorial_task = new Array();
@@ -54,22 +60,22 @@ var MAX_CELL_SIZE = 100;
 
 // shuffle function from stack overflow
 function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+    var currentIndex = array.length, temporaryValue, randomIndex;
 
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
 
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
 
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
 
-  return array;
+    return array;
 }
 
 // creating a list of tasks in order to tell where we are
@@ -92,7 +98,7 @@ $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training
 
 // sleep function
 const sleep = (milliseconds) => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 // creating variables to keep track of global information
@@ -102,7 +108,7 @@ var numAttempts = 0;
 var numActions = 0;
 var task_index = 0;
 var maxNumAttempts = 3;
-var toolBar = document.getElementById('editor_grid_control_btns');
+var toolBar = document.getElementById("editor_grid_control_btns");
 
 // save function
 save_data = new Array();
@@ -111,36 +117,36 @@ function save(action = "", select_data = Array(), copy_data = Array(), written_s
 
     // get current date and time
     var today = new Date();
-    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var date = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    var dateTime = date+' '+time;
+    var dateTime = date+" "+time;
     
-    save_list = new Array(numActions, action, output_to_string(),
-                          selected_tool(), getSelectedSymbol(),get_size(),
+    save_list = new Array(numActions, action, outputToString(),
+                          selectedTool(), getSelectedSymbol(), getSize(),
                           select_data, copy_data, taskName, written_sol, dateTime);
     save_data.push(save_list);
     console.log(save_data)
 }
 
 // querying variables
-function selected_tool() {
-    mode = $('input[name=tool_switching]:checked').val();
+function selectedTool() {
+    mode = $("input[name=tool_switching]:checked").val();
     return(mode);
 }
 
 function getSelectedSymbol() {
-    selected = $('#symbol_picker .selected-symbol-preview')[0];
-    return $(selected).attr('symbol');
+    selected = $("#symbol_picker .selected-symbol-preview")[0];
+    return $(selected).attr("symbol");
 }
 
-function get_size() {
-    height = $('#height').val();
-    width = $('#width').val();
+function getSize() {
+    height = $("#height").val();
+    width = $("#width").val();
     return Array(height, width);
 }
 
 // converting output grid to string
-function output_to_string(){
+function outputToString(){
     syncFromEditionGridToDataGrid();
     var stringGrid = "";
     var dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
@@ -159,23 +165,23 @@ function output_to_string(){
 // Text helpers
 
 function help() {
-    alert('The left side is the input, the right side is the output');
+    alert("The left side is the input, the right side is the output");
     var msg = "Instructions"
-    $('#error_display').stop(true, true);
-    $('#info_display').stop(true, true);
+    $("#error_display").stop(true, true);
+    $("#info_display").stop(true, true);
 
-    $('#error_display').hide();
-    $('#info_display').hide();
-    $('#help_text').html(msg);
-    $('#help_text').show();
-    $('#help_text').fadeOut(5000);
+    $("#error_display").hide();
+    $("#info_display").hide();
+    $("#help_text").html(msg);
+    $("#help_text").show();
+    $("#help_text").fadeOut(5000);
 }
 
 function resetTask() {
     CURRENT_INPUT_GRID = new Grid(3, 3);
     TEST_PAIRS = new Array();
     CURRENT_TEST_PAIR_INDEX = 0;
-    $('#task_preview').html('');
+    $("#task_preview").html("");
     resetOutputGrid();
 }
 
@@ -187,46 +193,46 @@ function refreshEditionGrid(jqGrid, dataGrid) {
 }
 
 function syncFromEditionGridToDataGrid() {
-    copyJqGridToDataGrid($('#output_grid .edition_grid'), CURRENT_OUTPUT_GRID);
+    copyJqGridToDataGrid($("#output_grid .edition_grid"), CURRENT_OUTPUT_GRID);
 }
 
 function syncFromDataGridToEditionGrid() {
-    refreshEditionGrid($('#output_grid .edition_grid'), CURRENT_OUTPUT_GRID);
+    refreshEditionGrid($("#output_grid .edition_grid"), CURRENT_OUTPUT_GRID);
 }
 
 function setUpEditionGridListeners(jqGrid) {
-    jqGrid.find('.cell').click(function(event) {
+    jqGrid.find(".cell").click(function(event) {
         cell = $(event.target);
         symbol = getSelectedSymbol();
 
-        mode = $('input[name=tool_switching]:checked').val();
-        if (mode == 'floodfill') {
+        mode = $("input[name=tool_switching]:checked").val();
+        if (mode == "floodfill") {
             // If floodfill: fill all connected cells.
             syncFromEditionGridToDataGrid();
             grid = CURRENT_OUTPUT_GRID.grid;
-            floodfillFromLocation(grid, cell.attr('x'), cell.attr('y'), symbol);
+            floodfillFromLocation(grid, cell.attr("x"), cell.attr("y"), symbol);
             syncFromDataGridToEditionGrid();
 
             // TODO: save action
-            // console.log('action: flood fill at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            // console.log("action: flood fill at (" + cell.attr("x") + ", " + cell.attr("y") + ") with colour " + symbol);
             save(action="floodfill");
         }
-        else if (mode == 'edit') {
+        else if (mode == "edit") {
             // Else: fill just this cell.
             setCellSymbol(cell, symbol);
 
             // TODO: save action
-            // console.log('action: edit at (' + cell.attr('x') + ', ' + cell.attr('y') + ') with colour ' + symbol);
+            // console.log("action: edit at (" + cell.attr("x") + ", " + cell.attr("y") + ") with colour " + symbol);
             save(action="edit");
         }
     });
 }
 
 function resizeOutputGrid() {
-    height = $('#height').val();
-    width = $('#width').val();
+    height = $("#height").val();
+    width = $("#width").val();
 
-    jqGrid = $('#output_grid .edition_grid');
+    jqGrid = $("#output_grid .edition_grid");
     syncFromEditionGridToDataGrid();
     dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     CURRENT_OUTPUT_GRID = new Grid(height, width, dataGrid);
@@ -235,11 +241,11 @@ function resizeOutputGrid() {
 }
 
 function resetColorBlack() {
-    symbol_preview = $('#selected_first');
-    $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-        $(preview).removeClass('selected-symbol-preview');
+    symbol_preview = $("#selected_first");
+    $("#symbol_picker").find(".symbol_preview").each(function(i, preview) {
+        $(preview).removeClass("selected-symbol-preview");
     })
-    symbol_preview.addClass('selected-symbol-preview');
+    symbol_preview.addClass("selected-symbol-preview");
 }
 
 function resetOutputGrid() {
@@ -248,15 +254,15 @@ function resetOutputGrid() {
     syncFromDataGridToEditionGrid();
 
     // resize grid
-    jqGrid = $('#output_grid .edition_grid');
+    jqGrid = $("#output_grid .edition_grid");
     syncFromEditionGridToDataGrid();
     dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     CURRENT_OUTPUT_GRID = new Grid(3, 3, dataGrid);
     refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
 
     // set drop down values
-    height  = $('#height').val(3).change;
-    width = $('#width').val(3).change;
+    height  = $("#height").val(3).change;
+    width = $("#width").val(3).change;
 
     // set color selector back to black
     resetColorBlack();
@@ -268,7 +274,7 @@ function resetOutputGrid() {
     COPY_PASTE_DATA = [];
     
     // TODO: save action
-    // console.log('action: reset grid');
+    // console.log("action: reset grid");
     save(action="reset grid")
 }
 
@@ -325,15 +331,15 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
 
 function loadJSONTask(train, test) {
     resetTask();
-    $('#modal_bg').hide();
-    $('#error_display').hide();
-    $('#info_display').hide();
+    $("#modal_bg").hide();
+    $("#error_display").hide();
+    $("#info_display").hide();
 
     for (var i = 0; i < train.length; i++) {
         pair = train[i];
-        values = pair['input'];
+        values = pair["input"];
         input_grid = convertSerializedGridToGridObject(values)
-        values = pair['output'];
+        values = pair["output"];
         output_grid = convertSerializedGridToGridObject(values)
         fillPairPreview(i, input_grid, output_grid);
     }
@@ -341,12 +347,12 @@ function loadJSONTask(train, test) {
         pair = test[i];
         TEST_PAIRS.push(pair);
     }
-    values = TEST_PAIRS[0]['input'];
+    values = TEST_PAIRS[0]["input"];
     CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
     fillTestInput(CURRENT_INPUT_GRID);
     CURRENT_TEST_PAIR_INDEX = 0;
-    $('#current_test_input_id_display').html('1');
-    $('#total_test_input_count_display').html(test.length);
+    $("#current_test_input_id_display").html("1");
+    $("#total_test_input_count_display").html(test.length);
 
     // set black as the intial selected color
     resetColorBlack();
@@ -382,15 +388,16 @@ function loadTaskFromFile(e) {
 // Used in this experiment
 
 function startTutorial() {
-    document.getElementById('modal_bg').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('last_page').style.display = 'none';
-    document.getElementById('tutorial_bg').style.display = 'block';
+    // hide other pages
+    $('#model_bg').hide();
+    $('#last_page').hide();
+    $('#tutorial_bg').show();
+    
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-    function(tasks) {
-      var task = tasks[tutorial_task[0][1]];
-      verify(task); })
+              function(tasks) {
+                  var task = tasks[tutorial_task[0][1]];
+                  verify(task); })
     // document.getElementById('workspace').style.display = 'none';
 
     // document.getElementById('tutorial').style.display = 'block'
@@ -400,21 +407,21 @@ function checkUnderstanding() {
     $('html,body').scrollTop(0);
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-      function(tasks) {
-      var task = tasks[taskList[0][1]];
-      window.taskName = task.name;
-      window.prevTask = task["name"];
-      verify(task);
-    })
+              function(tasks) {
+                  var task = tasks[taskList[0][1]];
+                  window.taskName = task.name;
+                  window.prevTask = task["name"];
+                  verify(task);
+              })
 
-    .error(function(){
-      errorMsg('Error loading task list');
-    });
+        .error(function(){
+            errorMsg('Error loading task list');
+        });
 
     document.getElementById('modal_bg').style.display = 'none';
     document.getElementById('modal').style.display = 'none';
     document.getElementById('tutorial_bg').style.display = 'none';
-    document.getElementById('check_understanding').style.display = 'block';
+    document.getElementById('tutorial_quiz').style.display = 'block';
 }
 
 function evalAnswers() {
@@ -433,11 +440,6 @@ function evalAnswers() {
         // $('#incorrect_submission').css("display", "inline");
         $('#incorrect_submission').css("opacity", "1");
         $('#incorrect_submission').animate({opacity: 0}, 5000);
-
-        // $('#incorrect_submission').css('opacity', 1);
-        // $('#incorrect_submission').css('display', 'inline');
-        // $('#incorrect_submission').css('visibility', 'visible');
-        // $('#incorrect_submission').fadeOut(5000);
     }
     else {
         startExperiment()
@@ -445,23 +447,21 @@ function evalAnswers() {
 }
 
 function startExperiment() {
-
     document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
-    document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" ); 
+    document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" );
     document.getElementById("submit_description_btn").innerHTML = "Submit";
     document.getElementById('tutorial_bg').style.display = 'block';
     document.getElementById('tutorial_demonstration').style.display = 'none';
-    document.getElementById('check_understanding').style.display = 'none';
+    document.getElementById('tutorial_quiz').style.display = 'none';
     document.getElementById("random_task_btn").style.visibility = "hidden";
+    // document.getElementById('workspace').style.display = 'block;'
 
     document.getElementById('write_solution_box').value = " ";
     document.getElementById('write_solution').style.display = 'none';
     document.getElementById('submit_solution_btn').style.display = 'block';
     document.getElementById('editor_grid_control_btns').style.display = 'block';
     window.numAttempts = 0;
-
 }
-
 
 function nextTask() {
     sleep(1000).then(() => {
@@ -477,58 +477,56 @@ function nextTask() {
             document.getElementById('editor_grid_control_btns').style.display = 'block';
             window.numAttempts = 0;
             var subset = "training";
+
+            // show final page if participant has finished all tasks
             if (task_index == 9) {
                 document.getElementById('last_page').style.display = 'block';
                 document.getElementById('tutorial_bg').style.display = 'none';
             }
 
             $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
-                function(tasks) {
-                window.task_index ++; 
-                var task = tasks[taskList[task_index][1]];
-                verify(task);
-            })
-            .error(function(){
-              errorMsg('Error loading task list');
-            });
-
-            
+                      function(tasks) {
+                          window.task_index ++; 
+                          var task = tasks[taskList[task_index][1]];
+                          verify(task);
+                      })
+                .error(function(){
+                    errorMsg('Error loading task list');
+                });
         }
     })   
 }
 
 function verify(task) {
-  $.getJSON(task["download_url"], function(json) {
-      try {
-          train = json['train'];
-          test = json['test'];
-      } catch (e) {
-          errorMsg('Bad file format');
-          return;
-      }
-      loadJSONTask(train, test);
-      // infoMsg("Loaded task training/" + task["name"]);
-      $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Number of attempts</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
-      window.taskName = task.name;
-  })
-  .error(function(){
-    errorMsg('Error loading task');
-  });
+    $.getJSON(task["download_url"], function(json) {
+        try {
+            train = json['train'];
+            test = json['test'];
+        } catch (e) {
+            errorMsg('Bad file format');
+            return;
+        }
+        loadJSONTask(train, test);
+        // infoMsg("Loaded task training/" + task["name"]);
+        $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+        window.taskName = task.name;
+    })
+        .error(function(){
+            errorMsg('Error loading task');
+        });
 }
 
 function displayInfoBar(task_index, numAttempts){
-      $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Number of attempts</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
-    
-    // $('#current_task span').text('Task ' + (task_index + 1) + ' out of 10' + ', ' + 'Number of attempts: ' + numAttempts + '/' + maxNumAttempts);
+    $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
 }
 
 function submitWritten(){
-    document.getElementById('write_solution').style.display = 'block';
-    document.getElementById('submit_solution_btn').style.display = 'none';
-    document.getElementById('editor_grid_control_btns').style.display = 'none';
+    $('#write_solution').show();
+    $('#submit_solution_btn').hide();
+    $('#editor_grid_control_btns').hide();
 }
 
-function submitSolution_tutorial() {
+function submitTutorial() {
     if (window.confirm("Are you ready to submit?")) { 
         syncFromEditionGridToDataGrid();
         reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
@@ -537,6 +535,7 @@ function submitSolution_tutorial() {
             errorMsg('Wrong solution.');
             // errorMsg('Wrong shape.');
             numAttempts ++;
+            // TODO: remove the if block here, also are both blocks necessary?
             if (numAttempts == maxNumAttempts) {
                 $('html,body').scrollTop(0);
                 document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
@@ -550,6 +549,7 @@ function submitSolution_tutorial() {
             for (var j = 0; j < ref_row.length; j++){
                 if (ref_row[j] !== submitted_output[i][j]) {
                     window.numAttempts ++;
+                    // TODO: same as above, remove this part
                     if (numAttempts == maxNumAttempts) {
                         $('html,body').scrollTop(0);
                         document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
@@ -609,7 +609,7 @@ function submitSolution() {
         submitWritten();
     }
 }
-    
+
 
 // function findTask() {
 //    for (i = 0; i < taskList[0].length; i++) {
@@ -696,20 +696,20 @@ function nextTestInput() {
 }
 
 function displayNumAttempts(n) {
-  // var nAttempts = $('#evaluation_output_editor');
-  var nAttempts = $('#num_attempts');
-  if (!nAttempts.length) {
-    nAttempts = $('<div id="num_attempts">Number of attempts: 1</div>');
-    nAttempts.appendTo('#evaluation_output_editor')
-  }
-  // pairSlot = $('<div id="pair_preview_' + pairId + '" class="pair_preview" index="' + pairId + '"></div>');
-  // console.log(`<div id="num_attempts">Number of attempts: ${n}</div>`)
-  else {
-    nAttempts.html(`Number of attempts: ${n}`);
-  }
-  // = $('#num_attempts').html(`Number of attempts: ${n}`)
-  // var nAttempts = $('<div id="num_attempts">Number of attempts: </div>');
-  // nAttempts.appendTo('#evaluation_output_editor');
+    // var nAttempts = $('#evaluation_output_editor');
+    var nAttempts = $('#num_attempts');
+    if (!nAttempts.length) {
+        nAttempts = $('<div id="num_attempts">Number of attempts: 1</div>');
+        nAttempts.appendTo('#evaluation_output_editor')
+    }
+    // pairSlot = $('<div id="pair_preview_' + pairId + '" class="pair_preview" index="' + pairId + '"></div>');
+    // console.log(`<div id="num_attempts">Number of attempts: ${n}</div>`)
+    else {
+        nAttempts.html(`Number of attempts: ${n}`);
+    }
+    // = $('#num_attempts').html(`Number of attempts: ${n}`)
+    // var nAttempts = $('<div id="num_attempts">Number of attempts: </div>');
+    // nAttempts.appendTo('#evaluation_output_editor');
 
 }
 
@@ -758,7 +758,7 @@ function initializeSelectable() {
                         y = parseInt($(selected[i]).attr('y'));
                         SELECT_DATA.push([x, y]);
                     }
-                            
+                    
                     // console.log('action: selecting cells')
                     save(action = "selecting cells", select_data = SELECT_DATA);
 
@@ -805,7 +805,7 @@ $(document).ready(function () {
     });
 
     $('.load_task').on('click', function(event) {
-      event.target.value = "";
+        event.target.value = "";
     });
 
     $('input[type=radio][name=tool_switching]').change(function() {
