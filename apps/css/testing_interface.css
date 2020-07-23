@@ -12,15 +12,21 @@ body {
 }
 
 #tutorial_workspace {
-    width: 1430px;
-    margin-left: auto;
-    margin-right: auto;
+    /* width: 1430px; */
+    width: 100%;
+    float: left;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* display: block; */
 }
 
 #workspace {
-    width: 1430px;
-    margin-left: auto;
-    margin-right: auto;
+    /* width: 1430px; */
+    width: 100%;
+    float: left
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* display: block; */
 }
 
 #demonstration_examples_view {
@@ -201,6 +207,17 @@ label {
     visibility: hidden;
 }
 
+#correct_submission {
+    margin: auto;
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+    width: 650px;
+    margin-top: 50px;
+    color: green;
+    visibility: hidden;
+}
+
 input, button {
     font-size: 16px;
     margin-left: 10px;
@@ -304,11 +321,11 @@ input, button {
     margin-bottom: 20px;
 }
 
-#tutorial_pair{
+.tutorial_pair{
     text-align: center;
 }
 
-#tutorial_text {
+.tutorial_text {
     margin: auto;
     background-color: white;
     text-align: center;
@@ -317,7 +334,7 @@ input, button {
     margin-top: 50px;
 }
 
-#tutorial_video {
+.tutorial_video {
     margin: auto;
     background-color: white;
     text-align: center;
@@ -325,7 +342,6 @@ input, button {
 /*    width: 500px;*/
     margin-top: 50px;
 }
-
 
 #modal_bg {
     background-color: black;
@@ -350,10 +366,6 @@ input, button {
     display: none;
     background-color: white;
     width: 100%;
-    /* min-height: 10000px; */
-    position: absolute;
-    top: 0;
-    left: 0;
     overflow: hidden;
 }
 

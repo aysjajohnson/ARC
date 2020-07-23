@@ -21,14 +21,13 @@ $(document).ready(function () {
         save(action = "changed width");
     });
 
+    // hide other elements of the experiment initially
+    $('#tutorial_bg').hide();
+    $('#tutorial_quiz').hide();
+    $('#workspace').hide();
+    
     // automatically load a random task
     // randomTask();
-
-    // hide certain elements
-    $('#tutorial_bg').hide()
-    $('#tutorial_quiz').hide()
-    $('#eval_tutorial_btn').hide();
-    $('#last_page').hide();
 });
 
 // Experiment grids
@@ -104,7 +103,7 @@ const sleep = (milliseconds) => {
 // creating variables to keep track of global information
 var prevTask = "None";
 var taskName = "";
-var numAttempts = 0;
+var numAttempts = 1;
 var numActions = 0;
 var task_index = 0;
 var maxNumAttempts = 3;
@@ -359,6 +358,19 @@ function loadJSONTask(train, test) {
 
 }
 
+function loadNextTask() {
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
+              function(tasks) {
+                  window.task_index ++; 
+                  var task = tasks[taskList[task_index][1]];
+                  verify(task);
+              })
+        .error(function(){
+            errorMsg('Error loading task list');
+        });
+}
+
 function loadTaskFromFile(e) {
     var file = e.target.files[0];
     if (!file) {
@@ -392,18 +404,24 @@ function startTutorial() {
     $('#model_bg').hide();
     $('#last_page').hide();
     $('#tutorial_bg').show();
+    $('#workspace').show();
     
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
               function(tasks) {
                   var task = tasks[tutorial_task[0][1]];
-                  verify(task); })
-    // document.getElementById('workspace').style.display = 'none';
-
+                  verify(task);
+              })
+    // document.getElementById('workspace').style.display = 'block';
     // document.getElementById('tutorial').style.display = 'block'
 }
 
-function checkUnderstanding() {
+function tutorialQuiz() {
+    $('#tutorial_bg').hide();
+    $('#workspace').hide();
+    $('#tutorial_quiz').show();
+    $('#tutorial_quiz_btn').show();
+    
     $('html,body').scrollTop(0);
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
@@ -417,11 +435,6 @@ function checkUnderstanding() {
         .error(function(){
             errorMsg('Error loading task list');
         });
-
-    document.getElementById('modal_bg').style.display = 'none';
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('tutorial_bg').style.display = 'none';
-    document.getElementById('tutorial_quiz').style.display = 'block';
 }
 
 function evalAnswers() {
@@ -437,30 +450,47 @@ function evalAnswers() {
 
         $('#incorrect_submission').stop(true, true);
         $('#incorrect_submission').css('visibility', 'visible');
-        // $('#incorrect_submission').css("display", "inline");
         $('#incorrect_submission').css("opacity", "1");
         $('#incorrect_submission').animate({opacity: 0}, 5000);
     }
     else {
-        startExperiment()
+        startExperiment();
     }
 }
 
+function resetEditor() {
+    $('#write_solution').hide();
+    $('#write_solution_box').first().value = " ";
+    $('#submit_solution_btn').show();
+    $('#editor_grid_control_btns').show();
+}
+
+
 function startExperiment() {
-    document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
-    document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" );
-    document.getElementById("submit_description_btn").innerHTML = "Submit";
-    document.getElementById('tutorial_bg').style.display = 'block';
-    document.getElementById('tutorial_demonstration').style.display = 'none';
-    document.getElementById('tutorial_quiz').style.display = 'none';
-    document.getElementById("random_task_btn").style.visibility = "hidden";
+    $('#modal_bg').hide();
+    $('#tutorial_demonstration').hide();
+    $('#tutorial_quiz').hide();
+    $('#tutorial_bg').show();
+    $('#workspace').show();
+    $('#evaluation-input-view').show();
+
+    loadNextTask();
+    resetEditor();
+    
+    // document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
+    // document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" );
+    // document.getElementById("submit_description_btn").innerHTML = "Submit";
+    // document.getElementById('tutorial_bg').style.display = 'block';
+    // document.getElementById('tutorial_demonstration').style.display = 'none';
+    // document.getElementById('tutorial_quiz').style.display = 'none';
+    // document.getElementById("random_task_btn").style.visibility = "hidden";
     // document.getElementById('workspace').style.display = 'block;'
 
-    document.getElementById('write_solution_box').value = " ";
-    document.getElementById('write_solution').style.display = 'none';
-    document.getElementById('submit_solution_btn').style.display = 'block';
-    document.getElementById('editor_grid_control_btns').style.display = 'block';
-    window.numAttempts = 0;
+    // document.getElementById('write_solution_box').value = " ";
+    // document.getElementById('write_solution').style.display = 'none';
+    // document.getElementById('submit_solution_btn').style.display = 'block';
+    // document.getElementById('editor_grid_control_btns').style.display = 'block';
+    window.numAttempts = 1;
 }
 
 function nextTask() {
@@ -471,28 +501,25 @@ function nextTask() {
         }
         else {
             save(action="write solution", select_data = Array(), copy_data = Array(), written_sol=writtenSolution);
-            document.getElementById('write_solution_box').value = " ";
-            document.getElementById('write_solution').style.display = 'none';
-            document.getElementById('submit_solution_btn').style.display = 'block';
-            document.getElementById('editor_grid_control_btns').style.display = 'block';
-            window.numAttempts = 0;
+            resetEditor();
+            // document.getElementById('write_solution_box').value = " ";
+            // document.getElementById('write_solution').style.display = 'none';
+            // document.getElementById('submit_solution_btn').style.display = 'block';
+            // document.getElementById('editor_grid_control_btns').style.display = 'block';
+            window.numAttempts = 1;
             var subset = "training";
 
             // show final page if participant has finished all tasks
-            if (task_index == 9) {
-                document.getElementById('last_page').style.display = 'block';
-                document.getElementById('tutorial_bg').style.display = 'none';
+            if (task_index == 10) {
+                // TODO: convert this to a function
+                $('tutorial_bg').hide();
+                $('#last_page').show();
+                // document.getElementById('last_page').style.display = 'block';
+                // document.getElementById('tutorial_bg').style.display = 'none';
             }
-
-            $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
-                      function(tasks) {
-                          window.task_index ++; 
-                          var task = tasks[taskList[task_index][1]];
-                          verify(task);
-                      })
-                .error(function(){
-                    errorMsg('Error loading task list');
-                });
+            else {
+                loadNextTask();
+            }
         }
     })   
 }
@@ -508,7 +535,7 @@ function verify(task) {
         }
         loadJSONTask(train, test);
         // infoMsg("Loaded task training/" + task["name"]);
-        $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+        $('#current_task span').html('<strong>Task</strong>: ' + (task_index) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
         window.taskName = task.name;
     })
         .error(function(){
@@ -517,7 +544,7 @@ function verify(task) {
 }
 
 function displayInfoBar(task_index, numAttempts){
-    $('#current_task span').html('<strong>Task</strong>: ' + (task_index + 1) + ' / 10' + ', ' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+    $('#current_task span').html('<strong>Task</strong>: ' + (task_index) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
 }
 
 function submitWritten(){
@@ -578,7 +605,7 @@ function submitSolution() {
             errorMsg('Wrong solution.');
             // errorMsg('Wrong shape.');
             numAttempts ++;
-            if (numAttempts == maxNumAttempts) {
+            if (numAttempts > maxNumAttempts) {
                 errorMsg('You made three errors, you will move on to the next task');
                 submitWritten();
             }
@@ -591,7 +618,7 @@ function submitSolution() {
             for (var j = 0; j < ref_row.length; j++){
                 if (ref_row[j] !== submitted_output[i][j]) {
                     window.numAttempts ++;
-                    if (numAttempts == maxNumAttempts) {
+                    if (numAttempts > maxNumAttempts) {
                         errorMsg('You made three errors, you will move on to the next task');
                         submitWritten();
                     }
