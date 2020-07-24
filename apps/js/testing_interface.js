@@ -1,11 +1,129 @@
 // this function runs when the page is loaded
 $(document).ready(function () {
-
     // show an alert if user tries to navigate away from this page
     // window.onbeforeunload = function() {
     //     return "You have not completed the experiment.";
     // };
 
+    $('#symbol_picker').find('.symbol_preview').click(function(event) {
+        symbol_preview = $(event.target);
+        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+            $(preview).removeClass('selected-symbol-preview');
+        })
+        symbol_preview.addClass('selected-symbol-preview');
+        
+        if ((toolMode == 'select') && ($('.edition_grid').find('.ui-selected').length > 0)) {
+            $('.edition_grid').find('.ui-selected').each(function(i, cell) {
+                symbol = getSelectedSymbol();
+                setCellSymbol($(cell), symbol);
+            });
+
+            // TODO: save action
+            // console.log('action: selected cells changed colour to ' + symbol);
+            save(action = "selected cells change color")
+        }
+        else {
+            // for edit and flood fill modes
+            // console.log('action: changed color to ' + getSelectedSymbol());
+            save(action = "changed color")
+            
+        }
+    });
+
+    $('.edition_grid').each(function(i, jqGrid) {
+        setUpEditionGridListeners($(jqGrid));
+    });
+
+    $('.load_task').on('change', function(event) {
+        loadTaskFromFile(event);
+    });
+
+    $('.load_task').on('click', function(event) {
+        event.target.value = "";
+    });
+
+    $('input[type=radio][name=tool_switching]').change(function() {
+        toolMode = $('input[name=tool_switching]:checked').val();
+        // console.log('action: changed tool to ' + toolMode);
+        save(action = "changed tool")
+        initializeSelectable();
+    });
+
+    $('body').keydown(function(event) {
+        // Copy and paste functionality.
+        if (event.which == 67) {
+            // Press C
+
+            selected = $('.ui-selected');
+            if (selected.length == 0) {
+                return;
+            }
+
+            COPY_PASTE_DATA = [];
+            for (var i = 0; i < selected.length; i ++) {
+                x = parseInt($(selected[i]).attr('x'));
+                y = parseInt($(selected[i]).attr('y'));
+                symbol = parseInt($(selected[i]).attr('symbol'));
+                COPY_PASTE_DATA.push([x, y, symbol]);
+            }
+            infoMsg('Cells copied! Select a target cell and press V to paste at location.');
+
+            // TODO: save action
+            // console.log('action: copied selected cells')
+            save(action = "copied selected cells", selectData = Array(), copyData = COPY_PASTE_DATA)
+        }
+        if (event.which == 86) {
+            // Press P
+            if (COPY_PASTE_DATA.length == 0) {
+                errorMsg('No data to paste.');
+                return;
+            }
+            selected = $('.edition_grid').find('.ui-selected');
+            if (selected.length == 0) {
+                errorMsg('Select a target cell on the output grid.');
+                return;
+            }
+
+            jqGrid = $(selected.parent().parent()[0]);
+
+            if (selected.length == 1) {
+                targetx = parseInt(selected.attr('x'));
+                targety = parseInt(selected.attr('y'));
+
+                xs = new Array();
+                ys = new Array();
+                symbols = new Array();
+
+                for (var i = 0; i < COPY_PASTE_DATA.length; i ++) {
+                    xs.push(COPY_PASTE_DATA[i][0]);
+                    ys.push(COPY_PASTE_DATA[i][1]);
+                    symbols.push(COPY_PASTE_DATA[i][2]);
+                }
+
+                minx = Math.min(...xs);
+                miny = Math.min(...ys);
+                for (var i = 0; i < xs.length; i ++) {
+                    x = xs[i];
+                    y = ys[i];
+                    symbol = symbols[i];
+                    newx = x - minx + targetx;
+                    newy = y - miny + targety;
+                    res = jqGrid.find('[x="' + newx + '"][y="' + newy + '"] ');
+                    if (res.length == 1) {
+                        cell = $(res[0]);
+                        setCellSymbol(cell, symbol);
+                    }
+                }
+
+                // TODO: save action
+                // console.log('action: pasted selected cells')
+                save(action = "pasted selected cells")
+            } else {
+                errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
+            }
+        }
+    });
+    
     // add things to detect if height or width are resized
     $("#height").change(function() {
         // console.log("action: changed height of output grid to " +
@@ -22,12 +140,9 @@ $(document).ready(function () {
     });
 
     // hide other elements of the experiment initially
-    $('#tutorial_bg').hide();
+    $('#tutorial_container').hide();
     $('#tutorial_quiz').hide();
-    $('#workspace').hide();
-    
-    // automatically load a random task
-    // randomTask();
+    $('#workspace').hide();    
 });
 
 // Experiment grids
@@ -105,13 +220,14 @@ var prevTask = "None";
 var taskName = "";
 var numAttempts = 1;
 var numActions = 0;
-var task_index = 0;
+var taskIndex = 0;
 var maxNumAttempts = 3;
+var solved = false;
 var toolBar = document.getElementById("editor_grid_control_btns");
 
 // save function
 save_data = new Array();
-function save(action = "", select_data = Array(), copy_data = Array(), written_sol="") {
+function save(action = "", selectData = Array(), copyData = Array(), writtenSolution="") {
     window.numActions ++;
 
     // get current date and time
@@ -122,7 +238,7 @@ function save(action = "", select_data = Array(), copy_data = Array(), written_s
     
     save_list = new Array(numActions, action, outputToString(),
                           selectedTool(), getSelectedSymbol(), getSize(),
-                          select_data, copy_data, taskName, written_sol, dateTime);
+                          selectData, copyData, taskName, writtenSolution, dateTime);
     save_data.push(save_list);
     console.log(save_data)
 }
@@ -211,17 +327,31 @@ function setUpEditionGridListeners(jqGrid) {
             grid = CURRENT_OUTPUT_GRID.grid;
             floodfillFromLocation(grid, cell.attr("x"), cell.attr("y"), symbol);
             syncFromDataGridToEditionGrid();
-
-            // TODO: save action
-            // console.log("action: flood fill at (" + cell.attr("x") + ", " + cell.attr("y") + ") with colour " + symbol);
             save(action="floodfill");
         }
         else if (mode == "edit") {
-            // Else: fill just this cell.
             setCellSymbol(cell, symbol);
+            save(action="edit");
+        }
+    });
 
-            // TODO: save action
-            // console.log("action: edit at (" + cell.attr("x") + ", " + cell.attr("y") + ") with colour " + symbol);
+    // set up toggle to allow for draggable edit mode
+    var isToggle = false;
+    
+    jqGrid.find(".cell").mousedown(function(event) {
+        isToggle = true;
+    });
+
+    jqGrid.find(".cell").mouseup(function(event) {
+        isToggle = false;
+    });
+
+    jqGrid.find(".cell").mousemove(function(event) {
+        if (isToggle && mode == "edit") {
+            cell = $(event.target);
+            symbol = getSelectedSymbol();
+            mode = $("input[name=tool_switching]:checked").val();
+            setCellSymbol(cell, symbol);
             save(action="edit");
         }
     });
@@ -359,11 +489,15 @@ function loadJSONTask(train, test) {
 }
 
 function loadNextTask() {
+    // reset boolean tracking whether task is solved
+    solved = false;
+
+    // load next task
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
               function(tasks) {
-                  window.task_index ++; 
-                  var task = tasks[taskList[task_index][1]];
+                  window.taskIndex ++; 
+                  var task = tasks[taskList[taskIndex][1]];
                   verify(task);
               })
         .error(function(){
@@ -402,23 +536,17 @@ function loadTaskFromFile(e) {
 function startTutorial() {
     // hide other pages
     $('#model_bg').hide();
-    $('#last_page').hide();
-    $('#tutorial_bg').show();
-    $('#workspace').show();
+    $('#experiment_finish').hide();
+    $('#tutorial_container').show();
     
-    var subset = "training";
-    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-              function(tasks) {
-                  var task = tasks[tutorial_task[0][1]];
-                  verify(task);
-              })
     // document.getElementById('workspace').style.display = 'block';
     // document.getElementById('tutorial').style.display = 'block'
 }
 
 function tutorialQuiz() {
-    $('#tutorial_bg').hide();
+    $('#tutorial_container').hide();
     $('#workspace').hide();
+    $('#experiment_finish').hide();
     $('#tutorial_quiz').show();
     $('#tutorial_quiz_btn').show();
     
@@ -468,9 +596,8 @@ function resetEditor() {
 
 function startExperiment() {
     $('#modal_bg').hide();
-    $('#tutorial_demonstration').hide();
+    $('#tutorial_container').hide();
     $('#tutorial_quiz').hide();
-    $('#tutorial_bg').show();
     $('#workspace').show();
     $('#evaluation-input-view').show();
 
@@ -494,28 +621,22 @@ function startExperiment() {
 }
 
 function nextTask() {
-    sleep(1000).then(() => {
+    sleep(0).then(() => {
         var writtenSolution = document.getElementById("write_solution_box").value;
         if (writtenSolution == " ") {
             errorMsg('Nothing to submit')
         }
         else {
-            save(action="write solution", select_data = Array(), copy_data = Array(), written_sol=writtenSolution);
+            save(action="write solution", selectData=Array(),
+                 copyData=Array(), writtenSolution=writtenSolution);
             resetEditor();
-            // document.getElementById('write_solution_box').value = " ";
-            // document.getElementById('write_solution').style.display = 'none';
-            // document.getElementById('submit_solution_btn').style.display = 'block';
-            // document.getElementById('editor_grid_control_btns').style.display = 'block';
             window.numAttempts = 1;
-            var subset = "training";
 
             // show final page if participant has finished all tasks
-            if (task_index == 10) {
+            if (taskIndex == 10) {
                 // TODO: convert this to a function
-                $('tutorial_bg').hide();
-                $('#last_page').show();
-                // document.getElementById('last_page').style.display = 'block';
-                // document.getElementById('tutorial_bg').style.display = 'none';
+                $('tutorial_container').hide();
+                $('#experiment_finish').show();
             }
             else {
                 loadNextTask();
@@ -535,7 +656,7 @@ function verify(task) {
         }
         loadJSONTask(train, test);
         // infoMsg("Loaded task training/" + task["name"]);
-        $('#current_task span').html('<strong>Task</strong>: ' + (task_index) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+        $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
         window.taskName = task.name;
     })
         .error(function(){
@@ -543,8 +664,8 @@ function verify(task) {
         });
 }
 
-function displayInfoBar(task_index, numAttempts){
-    $('#current_task span').html('<strong>Task</strong>: ' + (task_index) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+function displayInfoBar(taskIndex, numAttempts){
+    $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
 }
 
 function submitWritten(){
@@ -558,18 +679,6 @@ function submitTutorial() {
         syncFromEditionGridToDataGrid();
         reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
         submitted_output = CURRENT_OUTPUT_GRID.grid;
-        if (reference_output.length !== submitted_output.length) {
-            errorMsg('Wrong solution.');
-            // errorMsg('Wrong shape.');
-            numAttempts ++;
-            // TODO: remove the if block here, also are both blocks necessary?
-            if (numAttempts == maxNumAttempts) {
-                $('html,body').scrollTop(0);
-                document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
-            }
-            displayInfoBar(task_index, numAttempts);
-            return
-        }
 
         for (var i = 0; i < reference_output.length; i++){
             ref_row = reference_output[i];
@@ -579,11 +688,10 @@ function submitTutorial() {
                     // TODO: same as above, remove this part
                     if (numAttempts == maxNumAttempts) {
                         $('html,body').scrollTop(0);
-                        document.getElementById('tutorial_bg').innerHTML = 'You made three errors, you cannot do this experiment.';
+                        document.getElementById('tutorial_container').innerHTML = 'You made three errors, you cannot do this experiment.';
                     }
-                    displayInfoBar(task_index, numAttempts);
+                    displayInfoBar(taskIndex, numAttempts);
                     errorMsg('Wrong solution.');
-                    // displayNumAttempts(numAttempts);
                     return
                 }
             }
@@ -597,42 +705,36 @@ function submitTutorial() {
 
 function submitSolution() {
     if (window.confirm("Are you ready to submit?")) { 
-        save(action="submit")
+
         syncFromEditionGridToDataGrid();
         reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
         submitted_output = CURRENT_OUTPUT_GRID.grid;
-        if (reference_output.length !== submitted_output.length) {
-            errorMsg('Wrong solution.');
-            // errorMsg('Wrong shape.');
-            numAttempts ++;
-            if (numAttempts > maxNumAttempts) {
-                errorMsg('You made three errors, you will move on to the next task');
-                submitWritten();
-            }
-            displayInfoBar(task_index, numAttempts);
-            return
-        }
 
         for (var i = 0; i < reference_output.length; i++){
             ref_row = reference_output[i];
             for (var j = 0; j < ref_row.length; j++){
                 if (ref_row[j] !== submitted_output[i][j]) {
                     window.numAttempts ++;
+                    save(action="submit")
+                    console.log(numAttempts);
                     if (numAttempts > maxNumAttempts) {
                         errorMsg('You made three errors, you will move on to the next task');
                         submitWritten();
                     }
-                    displayInfoBar(task_index, numAttempts);
-                    errorMsg('Wrong solution.');
-                    // displayNumAttempts(numAttempts);
+                    else {
+                        displayInfoBar(taskIndex, numAttempts);
+                        errorMsg('Wrong solution.');
+                    }
                     return
                 }
             }
 
         }
+
         window.numAttempts++;
-        // displayNumAttempts(numAttempts);
         infoMsg('Correct solution!');
+        solved = true;
+        save(action="submit")
         submitWritten();
     }
 }
@@ -787,7 +889,7 @@ function initializeSelectable() {
                     }
                     
                     // console.log('action: selecting cells')
-                    save(action = "selecting cells", select_data = SELECT_DATA);
+                    save(action="selecting cells", selectData=SELECT_DATA);
 
                 }
             }
@@ -795,125 +897,65 @@ function initializeSelectable() {
     }
 }
 
-// Initial event binding.
+// tutorial slideshow code
+var slideIndex = 1;
 
-$(document).ready(function () {
-    $('#symbol_picker').find('.symbol_preview').click(function(event) {
-        symbol_preview = $(event.target);
-        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-            $(preview).removeClass('selected-symbol-preview');
-        })
-        symbol_preview.addClass('selected-symbol-preview');
+// next/previous controls
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+// thumbnail image controls
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+function showSlides() {
+    $('#modal_bg').hide();
+    $('#tutorial_container').show();
+    
+    var i;
+    var n = slideIndex;
+
+    var slides = $('.tutorial_slide');
+    // var dots = document.getElementsByClassName("dot");
+    if (n < 1) {
+        slideIndex = 1 // prevent going past the first slide
+    }
+    else if (n > slides.length) {
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none"; 
+        }
+
+        // hide tutorial and prev/next buttons
+        $('#tutorial_container').hide();
+        $('.prev').hide();
+        $('.next').hide();
         
-        if ((toolMode == 'select') && ($('.edition_grid').find('.ui-selected').length > 0)) {
-            $('.edition_grid').find('.ui-selected').each(function(i, cell) {
-                symbol = getSelectedSymbol();
-                setCellSymbol($(cell), symbol);
-            });
+        // display workspace
+        $('#workspace').show();
+        var subset = "training";
+        $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+                  function(tasks) {
+                      var task = tasks[tutorial_task[0][1]];
+                      verify(task);
+                  });
+    } 
 
-            // TODO: save action
-            // console.log('action: selected cells changed colour to ' + symbol);
-            save(action = "selected cells change color")
-        }
-        else {
-            // for edit and flood fill modes
-            // console.log('action: changed color to ' + getSelectedSymbol());
-            save(action = "changed color")
-            
-        }
-    });
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none"; 
+    }
+    // for (i = 0; i < dots.length; i++) {
+    //     dots[i].className = dots[i].className.replace(" active", "");
+    // }
+    slides[slideIndex-1].style.display = "block"; 
+ //    dots[slideIndex-1].className += " active";
+}
 
-    $('.edition_grid').each(function(i, jqGrid) {
-        setUpEditionGridListeners($(jqGrid));
-    });
-
-    $('.load_task').on('change', function(event) {
-        loadTaskFromFile(event);
-    });
-
-    $('.load_task').on('click', function(event) {
-        event.target.value = "";
-    });
-
-    $('input[type=radio][name=tool_switching]').change(function() {
-        toolMode = $('input[name=tool_switching]:checked').val();
-        // console.log('action: changed tool to ' + toolMode);
-        save(action = "changed tool")
-        initializeSelectable();
-    });
-
-    $('body').keydown(function(event) {
-        // Copy and paste functionality.
-        if (event.which == 67) {
-            // Press C
-
-            selected = $('.ui-selected');
-            if (selected.length == 0) {
-                return;
-            }
-
-            COPY_PASTE_DATA = [];
-            for (var i = 0; i < selected.length; i ++) {
-                x = parseInt($(selected[i]).attr('x'));
-                y = parseInt($(selected[i]).attr('y'));
-                symbol = parseInt($(selected[i]).attr('symbol'));
-                COPY_PASTE_DATA.push([x, y, symbol]);
-            }
-            infoMsg('Cells copied! Select a target cell and press V to paste at location.');
-
-            // TODO: save action
-            // console.log('action: copied selected cells')
-            save(action = "copied selected cells", select_data = Array(), copy_data = COPY_PASTE_DATA)
-        }
-        if (event.which == 86) {
-            // Press P
-            if (COPY_PASTE_DATA.length == 0) {
-                errorMsg('No data to paste.');
-                return;
-            }
-            selected = $('.edition_grid').find('.ui-selected');
-            if (selected.length == 0) {
-                errorMsg('Select a target cell on the output grid.');
-                return;
-            }
-
-            jqGrid = $(selected.parent().parent()[0]);
-
-            if (selected.length == 1) {
-                targetx = parseInt(selected.attr('x'));
-                targety = parseInt(selected.attr('y'));
-
-                xs = new Array();
-                ys = new Array();
-                symbols = new Array();
-
-                for (var i = 0; i < COPY_PASTE_DATA.length; i ++) {
-                    xs.push(COPY_PASTE_DATA[i][0]);
-                    ys.push(COPY_PASTE_DATA[i][1]);
-                    symbols.push(COPY_PASTE_DATA[i][2]);
-                }
-
-                minx = Math.min(...xs);
-                miny = Math.min(...ys);
-                for (var i = 0; i < xs.length; i ++) {
-                    x = xs[i];
-                    y = ys[i];
-                    symbol = symbols[i];
-                    newx = x - minx + targetx;
-                    newy = y - miny + targety;
-                    res = jqGrid.find('[x="' + newx + '"][y="' + newy + '"] ');
-                    if (res.length == 1) {
-                        cell = $(res[0]);
-                        setCellSymbol(cell, symbol);
-                    }
-                }
-
-                // TODO: save action
-                // console.log('action: pasted selected cells')
-                save(action = "pasted selected cells")
-            } else {
-                errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
-            }
-        }
-    });
-});
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
