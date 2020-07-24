@@ -5,6 +5,25 @@ $(document).ready(function () {
     //     return "You have not completed the experiment.";
     // };
 
+    // get tutorial task and all tasks for the experiment
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+        for (i=0; i<tasks.length; i++) {
+            if (grids.includes(tasks[i].name)) {
+                taskList.push([tasks[i],i]);
+            }
+        }
+        shuffle(taskList)
+    });
+
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
+        for (i=0; i<tasks.length; i++) {
+            if (tutorial_grid.includes(tasks[i].name)) {
+                tutorialTask.push([tasks[i],i]);
+            }
+        }
+    });
+
+    // set up click functionality for the color change panel
     $('#symbol_picker').find('.symbol_preview').click(function(event) {
         symbol_preview = $(event.target);
         $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
@@ -18,15 +37,11 @@ $(document).ready(function () {
                 setCellSymbol($(cell), symbol);
             });
 
-            // TODO: save action
-            // console.log('action: selected cells changed colour to ' + symbol);
-            save(action = "selected cells change color")
+            save(action="select_change_color")
         }
         else {
             // for edit and flood fill modes
-            // console.log('action: changed color to ' + getSelectedSymbol());
-            save(action = "changed color")
-            
+            save(action="change_color")
         }
     });
 
@@ -44,8 +59,7 @@ $(document).ready(function () {
 
     $('input[type=radio][name=tool_switching]').change(function() {
         toolMode = $('input[name=tool_switching]:checked').val();
-        // console.log('action: changed tool to ' + toolMode);
-        save(action = "changed tool")
+        save(action="change_tool")
         initializeSelectable();
     });
 
@@ -66,21 +80,19 @@ $(document).ready(function () {
                 symbol = parseInt($(selected[i]).attr('symbol'));
                 COPY_PASTE_DATA.push([x, y, symbol]);
             }
-            infoMsg('Cells copied! Select a target cell and press V to paste at location.');
+            infoMsg('Copied cells to clipboard! Select a single target cell in the Test Output and press V to paste at that location');
 
-            // TODO: save action
-            // console.log('action: copied selected cells')
-            save(action = "copied selected cells", selectData = Array(), copyData = COPY_PASTE_DATA)
+            save(action="select_copy")
         }
         if (event.which == 86) {
-            // Press P
+            // Press V
             if (COPY_PASTE_DATA.length == 0) {
-                errorMsg('No data to paste.');
+                errorMsg('The clipboard is empty, please select some cells and press C to copy first');
                 return;
             }
             selected = $('.edition_grid').find('.ui-selected');
             if (selected.length == 0) {
-                errorMsg('Select a target cell on the output grid.');
+                errorMsg('Please select a single target cell in the Test Output to paste');
                 return;
             }
 
@@ -115,9 +127,7 @@ $(document).ready(function () {
                     }
                 }
 
-                // TODO: save action
-                // console.log('action: pasted selected cells')
-                save(action = "pasted selected cells")
+                save(action="select_paste")
             } else {
                 errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
             }
@@ -126,23 +136,20 @@ $(document).ready(function () {
     
     // add things to detect if height or width are resized
     $("#height").change(function() {
-        // console.log("action: changed height of output grid to " +
-        //            $("#height").val());
         resizeOutputGrid()
-        save(action = "changed height");
+        save(action="change_height");
     });
 
     $("#width").change(function() {
-        // console.log("action: changed width of output grid to " +
-        //            $("#width").val());
         resizeOutputGrid()
-        save(action = "changed width");
+        save(action="change_width");
     });
 
     // hide other elements of the experiment initially
     $('#tutorial_container').hide();
     $('#tutorial_quiz').hide();
-    $('#workspace').hide();    
+    $('#workspace').hide();
+    $('#experiment_finish').hide();
 });
 
 // Experiment grids
@@ -157,7 +164,7 @@ var grids = Array("1caeab9d.json","1e0a9b12.json","1f876c06.json","1fad071e.json
 var tutorial_grid = Array("00d62c1b.json")
 
 var taskList = new Array();
-var tutorial_task = new Array();
+var tutorialTask = new Array();
 
 // Internal state.
 var CURRENT_INPUT_GRID = new Grid(3, 3);
@@ -166,6 +173,8 @@ var TEST_PAIRS = new Array();
 var CURRENT_TEST_PAIR_INDEX = 0;
 var SELECT_DATA = new Array();
 var COPY_PASTE_DATA = new Array();
+var IS_TUTORIAL = true;
+var WRITTEN_SOLUTION = "";
 
 // Cosmetic.
 var EDITION_GRID_HEIGHT = 500;
@@ -192,24 +201,6 @@ function shuffle(array) {
     return array;
 }
 
-// creating a list of tasks in order to tell where we are
-$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
-    for (i=0; i<tasks.length; i++) {
-        if (grids.includes(tasks[i].name)) {
-            taskList.push([tasks[i],i]);
-        }
-    }
-    shuffle(taskList)
-});
-
-$.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + "training", function(tasks) {
-    for (i=0; i<tasks.length; i++) {
-        if (tutorial_grid.includes(tasks[i].name)) {
-            tutorial_task.push([tasks[i],i]);
-        }
-    }
-});
-
 // sleep function
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -227,24 +218,35 @@ var toolBar = document.getElementById("editor_grid_control_btns");
 
 // save function
 save_data = new Array();
-function save(action = "", selectData = Array(), copyData = Array(), writtenSolution="") {
+function save(action) {
     window.numActions ++;
 
     // get current date and time
-    var today = new Date();
-    var date = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
-    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    var dateTime = date+" "+time;
-    
-    save_list = new Array(numActions, action, outputToString(),
-                          selectedTool(), getSelectedSymbol(), getSize(),
-                          selectData, copyData, taskName, writtenSolution, dateTime);
+    var dateTime = new Date().toLocaleString()
+
+    // create object to store info
+    save_list = {action: action,
+                 num_actions: numActions,
+                 test_output_grid: outputToString(),
+                 test_output_size: getOutputSize(),
+                 selected_tool: getSelectedTool(),
+                 selected_symbol: getSelectedSymbol(),
+                 selected_data: SELECT_DATA,
+                 copy_paste_data: COPY_PASTE_DATA,
+                 task_number: taskIndex,
+                 task_name: taskName,
+                 attempt_number: numAttempts,
+                 solved: solved,
+                 written_solution: WRITTEN_SOLUTION,
+                 is_tutorial: IS_TUTORIAL,
+                 time: dateTime}
+
+    console.log(save_list);    
     save_data.push(save_list);
-    console.log(save_data)
 }
 
 // querying variables
-function selectedTool() {
+function getSelectedTool() {
     mode = $("input[name=tool_switching]:checked").val();
     return(mode);
 }
@@ -254,7 +256,7 @@ function getSelectedSymbol() {
     return $(selected).attr("symbol");
 }
 
-function getSize() {
+function getOutputSize() {
     height = $("#height").val();
     width = $("#width").val();
     return Array(height, width);
@@ -263,22 +265,23 @@ function getSize() {
 // converting output grid to string
 function outputToString(){
     syncFromEditionGridToDataGrid();
-    var stringGrid = "";
+    var stringGrid = "|";
     var dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     for (var i = 0; i < dataGrid.length; i++) {
         if (i == dataGrid.length - 1) {
-            stringGrid = stringGrid.concat(dataGrid[i].toString())
+            stringGrid = stringGrid.concat(dataGrid[i].join(""))
         }
         else {
-            stringGrid = stringGrid.concat(dataGrid[i].toString());
+            stringGrid = stringGrid.concat(dataGrid[i].join(""));
             stringGrid = stringGrid.concat("|");
         }
     }
+    stringGrid = stringGrid.concat("|");
+    
     return stringGrid;
 }
 
 // Text helpers
-
 function help() {
     alert("The left side is the input, the right side is the output");
     var msg = "Instructions"
@@ -347,12 +350,16 @@ function setUpEditionGridListeners(jqGrid) {
     });
 
     jqGrid.find(".cell").mousemove(function(event) {
+        mode = $("input[name=tool_switching]:checked").val();
+
         if (isToggle && mode == "edit") {
             cell = $(event.target);
             symbol = getSelectedSymbol();
-            mode = $("input[name=tool_switching]:checked").val();
-            setCellSymbol(cell, symbol);
-            save(action="edit");
+
+            if (cell.attr('symbol') != symbol) {
+                setCellSymbol(cell, symbol);
+                save(action="edit");
+            }
         }
     });
 }
@@ -366,7 +373,6 @@ function resizeOutputGrid() {
     dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     CURRENT_OUTPUT_GRID = new Grid(height, width, dataGrid);
     refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
-
 }
 
 function resetColorBlack() {
@@ -402,9 +408,7 @@ function resetOutputGrid() {
     // clear clipboard
     COPY_PASTE_DATA = [];
     
-    // TODO: save action
-    // console.log("action: reset grid");
-    save(action="reset grid")
+    save(action="reset_grid")
 }
 
 function copyFromInput() {
@@ -419,9 +423,34 @@ function copyFromInput() {
     $('#height').val(CURRENT_OUTPUT_GRID.height);
     $('#width').val(CURRENT_OUTPUT_GRID.width);
 
-    // TODO: save action
-    // console.log('action: copy from input')
-    save(action="copy from input")
+    save(action="copy_from_input")
+}
+
+function solve() {
+    // function to automatically solve the task
+    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+    syncFromEditionGridToDataGrid();
+    CURRENT_OUTPUT_GRID = convertSerializedGridToGridObject(reference_output);
+    syncFromDataGridToEditionGrid();
+
+    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height, CURRENT_OUTPUT_GRID.width);
+
+    // modify grid size values
+    $('#height').val(CURRENT_OUTPUT_GRID.height);
+    $('#width').val(CURRENT_OUTPUT_GRID.width);
+
+    save(action="auto_solve")
+
+    if (IS_TUTORIAL) {
+        $('#submit_tutorial_solution_btn').click();
+        $('#write_solution_box').val("test");
+        $('#submit_tutorial_description_btn').click();
+    }
+    else {
+        $('#submit_solution_btn').click();
+        $('#write_solution_box').val("test");
+        $('#submit_description_btn').click();
+    }
 }
 
 function fillPairPreview(pairId, inputGrid, outputGrid) {
@@ -459,11 +488,12 @@ function fillPairPreview(pairId, inputGrid, outputGrid) {
 }
 
 function loadJSONTask(train, test) {
-    resetTask();
     $("#modal_bg").hide();
     $("#error_display").hide();
     $("#info_display").hide();
 
+    resetTask();
+    
     for (var i = 0; i < train.length; i++) {
         pair = train[i];
         values = pair["input"];
@@ -482,10 +512,6 @@ function loadJSONTask(train, test) {
     CURRENT_TEST_PAIR_INDEX = 0;
     $("#current_test_input_id_display").html("1");
     $("#total_test_input_count_display").html(test.length);
-
-    // set black as the intial selected color
-    resetColorBlack();
-
 }
 
 function loadNextTask() {
@@ -496,9 +522,9 @@ function loadNextTask() {
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset,
               function(tasks) {
-                  window.taskIndex ++; 
                   var task = tasks[taskList[taskIndex][1]];
                   verify(task);
+                  window.taskIndex ++; 
               })
         .error(function(){
             errorMsg('Error loading task list');
@@ -530,17 +556,26 @@ function loadTaskFromFile(e) {
 }
 
 // Helper functions for loading different tasks
-
-// Used in this experiment
-
 function startTutorial() {
     // hide other pages
     $('#model_bg').hide();
     $('#experiment_finish').hide();
     $('#tutorial_container').show();
-    
-    // document.getElementById('workspace').style.display = 'block';
-    // document.getElementById('tutorial').style.display = 'block'
+}
+
+function finishTutorial() {
+    sleep(1000).then(() => {
+        WRITTEN_SOLUTION = document.getElementById("write_solution_box").value;
+        if (WRITTEN_SOLUTION == "") {
+            errorMsg('Please describe your solution to this task before pressing the Submit button');
+        }
+        else {
+            save(action="write_tutorial_description");
+            resetEditor();
+            window.numAttempts = 1;
+            tutorialQuiz();
+        }
+    });
 }
 
 function tutorialQuiz() {
@@ -549,7 +584,7 @@ function tutorialQuiz() {
     $('#experiment_finish').hide();
     $('#tutorial_quiz').show();
     $('#tutorial_quiz_btn').show();
-    
+
     $('html,body').scrollTop(0);
     var subset = "training";
     $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
@@ -582,28 +617,47 @@ function evalAnswers() {
         $('#incorrect_submission').animate({opacity: 0}, 5000);
     }
     else {
-        startExperiment();
+        $('#correct_submission').stop(true, true);
+        $('#correct_submission').css('visibility', 'visible');
+        $('#correct_submission').css("opacity", "1");
+        $('#correct_submission').animate({opacity: 0}, 5000);
+
+        sleep(2000).then(() => {        
+            startExperiment();
+        })
     }
 }
 
 function resetEditor() {
     $('#write_solution').hide();
-    $('#write_solution_box').first().value = " ";
+    $('#write_solution_box').first().val("");
+    $('#submit_tutorial_solution_btn').hide();
+    $('#submit_tutorial_description_btn').hide();
     $('#submit_solution_btn').show();
     $('#editor_grid_control_btns').show();
-}
 
+    IS_TUTORIAL = false;    
+}
 
 function startExperiment() {
     $('#modal_bg').hide();
     $('#tutorial_container').hide();
+    $('#tutorial_nav').hide();
     $('#tutorial_quiz').hide();
+    $('#experiment_finish').hide();
     $('#workspace').show();
     $('#evaluation-input-view').show();
 
+    if (IS_TUTORIAL) {
+        // this occurs when skipping straight to main
+
+
+    }
+
     loadNextTask();
     resetEditor();
-    
+
+    // TODO: figure this out based on interaction with tutorial stuff
     // document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
     // document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" );
     // document.getElementById("submit_description_btn").innerHTML = "Submit";
@@ -621,21 +675,22 @@ function startExperiment() {
 }
 
 function nextTask() {
-    sleep(0).then(() => {
-        var writtenSolution = document.getElementById("write_solution_box").value;
-        if (writtenSolution == " ") {
-            errorMsg('Nothing to submit')
+    sleep(1000).then(() => {
+        WRITTEN_SOLUTION = document.getElementById("write_solution_box").value;
+        if (WRITTEN_SOLUTION == "") {
+            errorMsg('Please describe your solution to this task before pressing the Submit button');
         }
         else {
-            save(action="write solution", selectData=Array(),
-                 copyData=Array(), writtenSolution=writtenSolution);
+            save(action="write_description");
             resetEditor();
             window.numAttempts = 1;
 
             // show final page if participant has finished all tasks
+            console.log(taskIndex);
             if (taskIndex == 10) {
+                console.log('finishing experiment!');
                 // TODO: convert this to a function
-                $('tutorial_container').hide();
+                $('#workspace').hide();
                 $('#experiment_finish').show();
             }
             else {
@@ -654,92 +709,222 @@ function verify(task) {
             errorMsg('Bad file format');
             return;
         }
+        window.taskName = task.name; // update task name
+        window.numActions = 0; // reset number of actions
         loadJSONTask(train, test);
-        // infoMsg("Loaded task training/" + task["name"]);
-        $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
-        window.taskName = task.name;
+        updateInfoBar();
     })
         .error(function(){
             errorMsg('Error loading task');
         });
 }
 
-function displayInfoBar(taskIndex, numAttempts){
-    $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+function updateInfoBar() {
+    if (IS_TUTORIAL) {
+        $('#current_task span').html('<strong>Task</strong>: Tutorial Example');
+    }
+    else {
+        $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+    }
 }
 
 function submitWritten(){
-    $('#write_solution').show();
-    $('#submit_solution_btn').hide();
+    if (IS_TUTORIAL) {
+        $('#submit_solution_btn').hide();
+        $('#submit_description_btn').hide();
+        $('#submit_tutorial_description_btn').show();
+    }
+    else {
+        $('#submit_tutorial_solution_btn').hide();
+        $('#submit_tutorial_description_btn').hide();
+        $('#submit_description_btn').show();
+    }
+
     $('#editor_grid_control_btns').hide();
+    $('#write_solution').show();
 }
 
 function submitTutorial() {
-    if (window.confirm("Are you ready to submit?")) { 
-        syncFromEditionGridToDataGrid();
-        reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
-        submitted_output = CURRENT_OUTPUT_GRID.grid;
+    syncFromEditionGridToDataGrid();
+    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+    submitted_output = CURRENT_OUTPUT_GRID.grid;
 
-        for (var i = 0; i < reference_output.length; i++){
-            ref_row = reference_output[i];
-            for (var j = 0; j < ref_row.length; j++){
-                if (ref_row[j] !== submitted_output[i][j]) {
-                    window.numAttempts ++;
-                    // TODO: same as above, remove this part
-                    if (numAttempts == maxNumAttempts) {
-                        $('html,body').scrollTop(0);
-                        document.getElementById('tutorial_container').innerHTML = 'You made three errors, you cannot do this experiment.';
-                    }
-                    displayInfoBar(taskIndex, numAttempts);
-                    errorMsg('Wrong solution.');
-                    return
-                }
+    for (var i = 0; i < reference_output.length; i++) {
+        ref_row = reference_output[i];
+        for (var j = 0; j < ref_row.length; j++){
+            if (ref_row[j] !== submitted_output[i][j]) {
+                save(action="submit_tutorial")
+                window.numAttempts ++;
+                errorMsg('Your response was incorrect, please try again');
+                return
             }
-
         }
-        window.numAttempts++;
-        submitWritten();
-        document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
     }
+
+    infoMsg('Your response was correct!')
+    save(action="submit_tutorial")
+    submitWritten();
 }
 
 function submitSolution() {
-    if (window.confirm("Are you ready to submit?")) { 
+    // if (window.confirm("Are you ready to submit?")) { 
+    syncFromEditionGridToDataGrid();
+    reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
+    submitted_output = CURRENT_OUTPUT_GRID.grid;
 
-        syncFromEditionGridToDataGrid();
-        reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
-        submitted_output = CURRENT_OUTPUT_GRID.grid;
+    for (var i = 0; i < reference_output.length; i++) {
+        ref_row = reference_output[i];
+        for (var j = 0; j < ref_row.length; j++){
+            if (ref_row[j] !== submitted_output[i][j]) {
+                save(action="submit")
+                window.numAttempts ++;
+                console.log(numAttempts);
+                if (numAttempts > maxNumAttempts) {
+                    // TODO: figure out whether or not to skip submitWritten
+                    errorMsg('You made three errors, you will move on to the next task');
+                    submitWritten();
+                }
+                else {
+                    updateInfoBar();
+                    errorMsg('Your response was incorrect, please try again');
+                }
+                return
+            }
+        }
+    }
 
-        for (var i = 0; i < reference_output.length; i++){
-            ref_row = reference_output[i];
-            for (var j = 0; j < ref_row.length; j++){
-                if (ref_row[j] !== submitted_output[i][j]) {
-                    window.numAttempts ++;
-                    save(action="submit")
-                    console.log(numAttempts);
-                    if (numAttempts > maxNumAttempts) {
-                        errorMsg('You made three errors, you will move on to the next task');
-                        submitWritten();
+    infoMsg('Your response was correct!');
+    solved = true;
+    save(action="submit")
+    submitWritten();
+    // }
+}
+
+function nextTestInput() {
+    if (TEST_PAIRS.length <= CURRENT_TEST_PAIR_INDEX + 1) {
+        errorMsg('No next test input. Pick another file?')
+        return
+    }
+    CURRENT_TEST_PAIR_INDEX += 1;
+    values = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['input'];
+    CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
+    fillTestInput(CURRENT_INPUT_GRID);
+    $('#current_test_input_id_display').html(CURRENT_TEST_PAIR_INDEX + 1);
+    $('#total_test_input_count_display').html(test.length);
+}
+
+function fillTestInput(inputGrid) {
+    jqInputGrid = $('#evaluation_input');
+    fillJqGridWithData(jqInputGrid, inputGrid);
+    fitCellsToContainer(jqInputGrid, inputGrid.height, inputGrid.width, 400, 400);
+}
+
+function initializeSelectable() {
+    try {
+        $('.selectable_grid').selectable('destroy');
+    }
+    catch (e) {
+    }
+    toolMode = $('input[name=tool_switching]:checked').val();
+    if (toolMode == 'select') {
+        infoMsg('Click and drag to select cells on the grid. Click on another color to change the color of all selected cells, or press C to copy the selected cells to the clipboard');
+        $('.selectable_grid').selectable(
+            {
+                autoRefresh: false,
+                filter: '> .row > .cell',
+                start: function(event, ui) {
+                    $('.ui-selected').each(function(i, e) {
+                        $(e).removeClass('ui-selected');
+                    });
+                },
+                stop: function(event, ui) {
+                    // log data that is selected
+                    // TODO: figure out how to determine if test input or test output is selected
+                    
+                    selected = $('.ui-selected');
+                    
+                    SELECT_DATA = [];
+                    for (var i = 0; i < selected.length; i ++) {
+                        x = parseInt($(selected[i]).attr('x'));
+                        y = parseInt($(selected[i]).attr('y'));
+                        SELECT_DATA.push([x, y]);
                     }
-                    else {
-                        displayInfoBar(taskIndex, numAttempts);
-                        errorMsg('Wrong solution.');
-                    }
-                    return
+                    
+                    save(action="select_cells");
                 }
             }
-
-        }
-
-        window.numAttempts++;
-        infoMsg('Correct solution!');
-        solved = true;
-        save(action="submit")
-        submitWritten();
+        );
     }
 }
 
+// tutorial slideshow code
+var slideIndex = 1;
 
+// next/previous controls
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+// thumbnail image controls
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+function showSlides() {
+    $('#modal_bg').hide();
+    $('#tutorial_container').show();
+    
+    var i;
+    var n = slideIndex;
+
+    var slides = $('.tutorial_slide');
+    var dots = $('.dot');
+
+    if (n < 1) {
+        slideIndex = 1 // prevent going past the first slide
+    }
+    else if (n >= 1 && n <= slides.length) {
+        // update active slide
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none"; 
+        }
+
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+
+        slides[slideIndex-1].style.display = "block"; 
+        dots[slideIndex-1].className += " active";
+    }
+    else if (n > slides.length) {
+        // hide slides and start tutorial task
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none"; 
+        }
+        startTutorialTask();
+    } 
+}
+
+function startTutorialTask() {
+    // go to the tutorial task
+    // hide tutorial stuff
+    $('#tutorial_container').hide();
+    $('#tutorial_nav').hide();
+    $('.prev').hide();
+    $('.next').hide();
+    $('#submit_solution_btn').hide();
+        
+    // display workspace
+    $('#workspace').show();
+    var subset = "training";
+    $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
+              function(tasks) {
+                  var task = tasks[tutorialTask[0][1]];
+                  verify(task);
+              });
+}
+
+// original code that is no longer needed
 // function findTask() {
 //    for (i = 0; i < taskList[0].length; i++) {
 //         if (taskList[0][i]["name"] == prevTask) {
@@ -766,7 +951,6 @@ function submitSolution() {
 //   }
 // }
 
-
 // Loading first, next, previous, and random tasks
 
 // function firstTask() {
@@ -781,8 +965,6 @@ function submitSolution() {
 //       errorMsg('Error loading task list');
 //     });
 // }
-
-
 
 // function previousTask() {
 //     var subset = "training";
@@ -811,151 +993,3 @@ function submitSolution() {
 //     });
 // }
 
-function nextTestInput() {
-    if (TEST_PAIRS.length <= CURRENT_TEST_PAIR_INDEX + 1) {
-        errorMsg('No next test input. Pick another file?')
-        return
-    }
-    CURRENT_TEST_PAIR_INDEX += 1;
-    values = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['input'];
-    CURRENT_INPUT_GRID = convertSerializedGridToGridObject(values)
-    fillTestInput(CURRENT_INPUT_GRID);
-    $('#current_test_input_id_display').html(CURRENT_TEST_PAIR_INDEX + 1);
-    $('#total_test_input_count_display').html(test.length);
-}
-
-function displayNumAttempts(n) {
-    // var nAttempts = $('#evaluation_output_editor');
-    var nAttempts = $('#num_attempts');
-    if (!nAttempts.length) {
-        nAttempts = $('<div id="num_attempts">Number of attempts: 1</div>');
-        nAttempts.appendTo('#evaluation_output_editor')
-    }
-    // pairSlot = $('<div id="pair_preview_' + pairId + '" class="pair_preview" index="' + pairId + '"></div>');
-    // console.log(`<div id="num_attempts">Number of attempts: ${n}</div>`)
-    else {
-        nAttempts.html(`Number of attempts: ${n}`);
-    }
-    // = $('#num_attempts').html(`Number of attempts: ${n}`)
-    // var nAttempts = $('<div id="num_attempts">Number of attempts: </div>');
-    // nAttempts.appendTo('#evaluation_output_editor');
-
-}
-
-function fillTestInput(inputGrid) {
-    jqInputGrid = $('#evaluation_input');
-    fillJqGridWithData(jqInputGrid, inputGrid);
-    fitCellsToContainer(jqInputGrid, inputGrid.height, inputGrid.width, 400, 400);
-}
-
-function copyToOutput() {
-    syncFromEditionGridToDataGrid();
-    CURRENT_OUTPUT_GRID = convertSerializedGridToGridObject(CURRENT_INPUT_GRID.grid);
-    syncFromDataGridToEditionGrid();
-    // changing code here
-    // $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height + 'x' + CURRENT_OUTPUT_GRID.width);
-    $('#output_grid_size').val(CURRENT_OUTPUT_GRID.height,CURRENT_OUTPUT_GRID.width);
-}
-
-function initializeSelectable() {
-    try {
-        $('.selectable_grid').selectable('destroy');
-    }
-    catch (e) {
-    }
-    toolMode = $('input[name=tool_switching]:checked').val();
-    if (toolMode == 'select') {
-        infoMsg('Select some cells and either click on a color to change all selected cells to that color, or press C to copy selected cells');
-        $('.selectable_grid').selectable(
-            {
-                autoRefresh: false,
-                filter: '> .row > .cell',
-                start: function(event, ui) {
-                    $('.ui-selected').each(function(i, e) {
-                        $(e).removeClass('ui-selected');
-                    });
-                },
-                stop: function(event, ui) {
-                    // log data that is selected
-                    // TODO: figure out how to determine if input or output is selected
-                    
-                    selected = $('.ui-selected');
-                    
-                    SELECT_DATA = [];
-                    for (var i = 0; i < selected.length; i ++) {
-                        x = parseInt($(selected[i]).attr('x'));
-                        y = parseInt($(selected[i]).attr('y'));
-                        SELECT_DATA.push([x, y]);
-                    }
-                    
-                    // console.log('action: selecting cells')
-                    save(action="selecting cells", selectData=SELECT_DATA);
-
-                }
-            }
-        );
-    }
-}
-
-// tutorial slideshow code
-var slideIndex = 1;
-
-// next/previous controls
-function plusSlides(n) {
-    showSlides(slideIndex += n);
-}
-
-// thumbnail image controls
-function currentSlide(n) {
-    showSlides(slideIndex = n);
-}
-
-function showSlides() {
-    $('#modal_bg').hide();
-    $('#tutorial_container').show();
-    
-    var i;
-    var n = slideIndex;
-
-    var slides = $('.tutorial_slide');
-    // var dots = document.getElementsByClassName("dot");
-    if (n < 1) {
-        slideIndex = 1 // prevent going past the first slide
-    }
-    else if (n > slides.length) {
-        for (i = 0; i < slides.length; i++) {
-            slides[i].style.display = "none"; 
-        }
-
-        // hide tutorial and prev/next buttons
-        $('#tutorial_container').hide();
-        $('.prev').hide();
-        $('.next').hide();
-        
-        // display workspace
-        $('#workspace').show();
-        var subset = "training";
-        $.getJSON("https://api.github.com/repos/fchollet/ARC/contents/data/" + subset, 
-                  function(tasks) {
-                      var task = tasks[tutorial_task[0][1]];
-                      verify(task);
-                  });
-    } 
-
-    for (i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none"; 
-    }
-    // for (i = 0; i < dots.length; i++) {
-    //     dots[i].className = dots[i].className.replace(" active", "");
-    // }
-    slides[slideIndex-1].style.display = "block"; 
- //    dots[slideIndex-1].className += " active";
-}
-
-function wait(ms){
-   var start = new Date().getTime();
-   var end = start;
-   while(end < start + ms) {
-     end = new Date().getTime();
-  }
-}
