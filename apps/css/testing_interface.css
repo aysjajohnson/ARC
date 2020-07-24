@@ -1,14 +1,18 @@
 body {
-    font-family: 'Arial', sans-serif;
-    min-width: 1430px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial; 
+    font-weight: 300;
+    font-size: 20px;
+    min-width: 1440px;
 }
 
 /*background used to be #d5d5d5 -- changing it to white #FFFFFF*/
 
 #current_task {
-    text-align: left;
-    margin-top: 5px;
+    text-align: center;
+    margin-top: 2px;
     margin-left: 10px;
+    height: 40px;
+    font-size: 18px;
 }
 
 #tutorial_container {
@@ -28,7 +32,8 @@ body {
 #workspace {
     /* width: 1430px; */
     width: 100%;
-    float: left
+    float: left;
+    font-size: 16px;
     /* margin-left: auto; */
     /* margin-right: auto; */
     /* display: block; */
@@ -48,7 +53,7 @@ body {
 #evaluation_view {
     border-radius: 10px;
     float: left;
-    width: 930px;
+    width: 960px;
     margin: 10px;
     margin-left: 5px;
     background-color: #d5d5d5;
@@ -63,7 +68,7 @@ body {
 
 #evaluation_output_editor {
     float: left;
-    width: 500px;
+    width: 530px;
     margin-top: 10px;
     /* margin-bottom: 10px; */
 }
@@ -81,7 +86,7 @@ body {
     margin-left: 10px;
     margin-right: 10px;
     background: white;
-    width: 910px;
+    width: 940px;
     /* padding-top: 5px; */
     padding-bottom: 5px;
     align-self: center;
@@ -93,22 +98,25 @@ body {
 }
 
 #write_solution {
+    font-size: 18px;
+    text-align: justify;
+    text-justify: auto;
     float: left;
     margin-top: 10px;
     margin-bottom: 10px;
-    margin-right: 10px;
     background: white;
-    width: 98%;
-    /* padding-top: 5px; */
-    /* padding-bottom: 5px; */
+    width: 510px;
     padding-left: 10px;
+    padding-right: 10px;
     border-radius: 6px;
 }
 
 #write_solution_box {
-    width: 98%;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial; 
+    font-size: 16px;
+    width: 100%;
     height: 100px;
-    padding: 10px;
+    padding: 5px;
     box-sizing: border-box;
     border: 2px solid #ccc;
     border-radius: 6px;
@@ -136,64 +144,64 @@ body {
 
 #submit_solution_btn {
     color: white;
-    border-radius: 4px;
+    border-radius: 8px;
     /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
     background: rgb(28, 184, 65);
     float: right;
-    margin-right: 10px;
-    margin-top: 0px;
+    margin-right: 8px;
+    margin-top: 2px;
 }
 
 #submit_solution_btn:active {
-  background: blue;
+    background: blue;
 }
 
 button:focus {outline:0;}
 
 #submit_description_btn {
     color: white;
-    border-radius: 4px;
+    border-radius: 8px;
     /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
     background: rgb(28, 184, 65);
     float: right;
-    margin-right: 10px;
-    margin-top: 0px;
+    /* margin-right: 8px; */
+    margin-top: 2px;
     margin-bottom: 10px;
 }
 
 #submit_description_btn:active {
-  background: blue;
+    background: blue;
 }
 
 #submit_tutorial_solution_btn {
     color: white;
-    border-radius: 4px;
+    border-radius: 8px;
     /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
     background: rgb(28, 184, 65);
     float: right;
-    margin-right: 10px;
-    margin-top: 0px;
+    margin-right: 8px;
+    margin-top: 2px;
 }
 
 #submit_tutorial_solution_btn:active {
-  background: blue;
+    background: blue;
 }
 
 button:focus {outline:0;}
 
 #submit_tutorial_description_btn {
     color: white;
-    border-radius: 4px;
+    border-radius: 8px;
     /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
     background: rgb(28, 184, 65);
     float: right;
-    margin-right: 10px;
+    /* margin-right: 8px; */
     margin-top: 0px;
     margin-bottom: 10px;
 }
 
 #submit_tutorial_ description_btn:active {
-  background: blue;
+    background: blue;
 }
 
 
@@ -227,6 +235,7 @@ label_heading {
 
 label {
     /* font-weight: bold; */
+    font-size: 18px;
     margin-left: 10px;
 }
 
@@ -256,15 +265,63 @@ label {
 }
 
 input, button {
-    font-size: 16px;
+    font-size: 18px;
+    /* font-weight: 600; */
+
+    /* default for <button>, but useful for <a> */
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+         
+    /* create a small space when buttons wrap on 2 lines */
+    margin: 2px 0;
+         
+    /* invisible border (will be colored on hover/focus) */
+    border: solid 1px transparent;
+    border-radius: 8px;
+         
+    /* size comes from text & padding (no width/height) */
+    padding: 0.5em 1em;
+         
+    /* make sure colors have enough contrast! */
+    color: #ffffff;
+    background-color: #0074D9;    
+    
     margin-left: 10px;
-    border-radius: 5px;
-    border-width: 1px;
-    border-color: black;
+    /* border-radius: 5px; */
+    /* border-width: 1px; */
+    /* border-color: black; */
     /* color: white; */
-    background-color: white;
-    /* padding: 5px; */
-    /* text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); */
+    /* background-color: white; */
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  transform: translateY(1px);
+  filter: saturate(150%);
+  background: #004B8D;
+}
+
+/* inverse colors on mouse-over */
+button:hover {
+  /* color: #0074D9; */
+  /* border-color: currentColor; */
+  /* background-color: white; */
+}
+
+/* inverse colors on mouse-over and focus */
+button:hover,
+button:focus {
+  /* color: #0074D9; */
+  /* border-color: currentColor; */
+  /* background-color: white; */
+  outline: none;
+  box-shadow: 0 0 0 3px #74BEFF,
+    0 0 0 1.5px #74BEFF;
 }
 
 #resize_btn {
@@ -295,10 +352,10 @@ input, button {
 }
 
 .preview_block {
-   height: 200px;
-   width: 200px;
-   float: left;
-   margin-bottom: 60px;
+    height: 200px;
+    width: 200px;
+    float: left;
+    margin-bottom: 60px;
 }
 
 .text {
@@ -333,7 +390,7 @@ input, button {
     margin-bottom: 0px;
     border-radius: 6px;
     font-weight: bold;
-    /* margin: 10px; */
+    font-size: 18px;
 }
 
 #test_input_header {
@@ -372,7 +429,6 @@ input, button {
     margin-top: 10px;
 }
 
-
 .tutorial_text {
     margin: auto;
     background-color: white;
@@ -387,7 +443,7 @@ input, button {
     background-color: white;
     text-align: center;
     vertical-align: top;
-/*    width: 500px;*/
+    /*    width: 500px;*/
     margin-top: 50px;
 }
 
@@ -425,8 +481,8 @@ input, button {
 }
 
 br {
-   display: block;
-   margin: 10px 0;
+    display: block;
+    margin: 10px 0;
 }
 
 #task_header {
@@ -438,36 +494,37 @@ br {
 }
 
 #info_display {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     margin-left: 0px;
 }
 
 /* Next & previous buttons */
 .prev, .next {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  width: auto;
-  margin-top: -22px;
-  padding: 16px;
-  color: black;
-  font-weight: bold;
-  font-size: 18px;
-  transition: 0.6s ease;
-  border-radius: 0 3px 3px 0;
-  user-select: none;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 16px;
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
 }
 
 /* Position the "next button" to the right */
 .next {
-  right: 0;
-  border-radius: 3px 0 0 3px;
+    right: 0;
+    border-radius: 3px 0 0 3px;
 }
 
 /* On hover, add a black background color with a little bit see-through */
 .prev:hover, .next:hover {
-  background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.2);
 }
 
 #tutorial_nav {
@@ -476,16 +533,25 @@ br {
 
 /* The dots/bullets/indicators */
 .dot {
-  cursor: pointer;
-  height: 15px;
-  width: 15px;
-  margin: 0 2px;
-  background-color: #bbb;
-  border-radius: 50%;
-  display: inline-block;
-  transition: background-color 0.6s ease;
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
 }
 
 .active, .dot:hover {
-  background-color: #717171;
+    background-color: #717171;
+}
+
+.tool {
+    margin-left: 3px;
+}
+
+label_heading {
+    font-size: 18px;
+    margin-bottom: 5px;
 }

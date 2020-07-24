@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/common.css">
     <link rel="stylesheet" type="text/css" href="css/testing_interface.css">
 
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet"> -->
 
   </head>
   <body>
@@ -30,9 +30,9 @@
     </div>
     <div id="tutorial_container">
       <div class="tutorial_slide">
-        <div><strong>ARC Tutorial</strong><br /><br /></div>
+        <!-- <div><strong>ARC Tutorial</strong><br /><br /></div> -->
         <div> In this experiment you will see several input and output pairs, like the ones below. Each output is some transformation of the input. You can think of it like a computer program applying to the input to produce the output. <br /> </div>
-        <br /><br><br>
+        <br /><br />
         <div class="tutorial_pair">
           <img src="img/input1.png" width="200" height="200">
           <div id="computer_arrow">
@@ -62,6 +62,7 @@
       <br><br>
 
       <div class="tutorial_slide">
+        <!-- <div><strong>ARC Tutorial</strong><br /><br /></div> -->
         <div> You will then see a test input and blank output. You should fill in the test output with your best guess at the program that completes the pattern. We will explain how to do this below. <br /> </div>
         <br /><br>
         <div class="tutorial_pair">
@@ -200,7 +201,7 @@
 
           <div id="edition_view">
             <div id="write_solution" style="display: none">
-              <p>Please describe your solution to this task using as many words as necessary. Your description will be passed onto another person, who will attempt to solve the same task with only the Test Input provided (and not any of the Example Input and Output pairs). When you are done please press the Submit button to continue.</p>
+              <p id="write_solution_text">Please describe your solution to this task using as many words as necessary. Your description will be passed onto another person, who will attempt to solve the same task with only the Test Input provided (and not any of the Example Input and Output pairs). When you are done, please press the Submit button to continue.</p>
               <form >
                 <textarea id="write_solution_box"></textarea>
               </form>
@@ -216,15 +217,15 @@
                   <br />
                   <input type="radio" id="tool_edit"
                          name="tool_switching" value="edit" checked>
-                  <label for="tool_edit"><strong>Edit</strong>: Modify single cells in the output grid</label>
+                  <label for="tool_edit" class="tool"><strong>Edit</strong>: Modify single cells in the output grid</label>
                   <br />
                   <input type="radio" id="tool_select"
                          name="tool_switching" value="select">
-                  <label for="tool_select"><strong>Select</strong>: Select multiple cells to modify</label>
+                  <label for="tool_select" class="tool"><strong>Select</strong>: Select multiple cells to modify</label>
                   <br />
                   <input type="radio" id="tool_floodfill"
                          name="tool_switching" value="floodfill">
-                  <label for="tool_floodfill"><strong>Flood Fill</strong>: Fill in connected areas of the same color</label>
+                  <label for="tool_floodfill" class="tool"><strong>Flood Fill</strong>: Fill in connected areas of the same color</label>
                   <br />
                 </div>
               </div>
@@ -302,10 +303,11 @@
                   <option value="24">24</option>
                   <option value="25">25</option>
                 </select>
+                <br /><br />
               </div>
 
-              <button onclick="copyFromInput()">Copy from input</button>
-              <button onclick="resetOutputGrid()">Reset grid</button>
+              <button onclick="copyFromInput()">Copy from Input</button>
+              <button onclick="resetOutputGrid()">Reset Grid</button>
               <button onclick="solve()">Solve</button>
               <button onclick="submitTutorial()" id="submit_tutorial_solution_btn">Submit</button>
               <button onclick="submitSolution()" id="submit_solution_btn">Submit</button>

@@ -80,7 +80,7 @@ $(document).ready(function () {
                 symbol = parseInt($(selected[i]).attr('symbol'));
                 COPY_PASTE_DATA.push([x, y, symbol]);
             }
-            infoMsg('Copied cells to clipboard! Select a single target cell in the Test Output and press V to paste at that location');
+            infoMsg('Copied cells to clipboard, select a single target cell in the Test Output and press V to paste at that location');
 
             save(action="select_copy")
         }
@@ -127,6 +127,7 @@ $(document).ready(function () {
                     }
                 }
 
+                infoMsg("Successfully pasted cells from clipboard!")
                 save(action="select_paste")
             } else {
                 errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
@@ -177,8 +178,8 @@ var IS_TUTORIAL = true;
 var WRITTEN_SOLUTION = "";
 
 // Cosmetic.
-var EDITION_GRID_HEIGHT = 500;
-var EDITION_GRID_WIDTH = 500;
+var EDITION_GRID_HEIGHT = 530;
+var EDITION_GRID_WIDTH = 530;
 var MAX_CELL_SIZE = 100;
 
 // shuffle function from stack overflow
@@ -407,7 +408,8 @@ function resetOutputGrid() {
 
     // clear clipboard
     COPY_PASTE_DATA = [];
-    
+
+    infoMsg("Resetting Test Output grid")
     save(action="reset_grid")
 }
 
@@ -423,6 +425,7 @@ function copyFromInput() {
     $('#height').val(CURRENT_OUTPUT_GRID.height);
     $('#width').val(CURRENT_OUTPUT_GRID.width);
 
+    infoMsg("Copied Test Input grid to Test Output")
     save(action="copy_from_input")
 }
 
@@ -449,7 +452,7 @@ function solve() {
     else {
         $('#submit_solution_btn').click();
         $('#write_solution_box').val("test");
-        $('#submit_description_btn').click();
+        // $('#submit_description_btn').click();
     }
 }
 
@@ -724,7 +727,7 @@ function updateInfoBar() {
         $('#current_task span').html('<strong>Task</strong>: Tutorial Example');
     }
     else {
-        $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + ' / 10' + '&nbsp;&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + ' / ' + maxNumAttempts);
+        $('#current_task span').html('<strong>Task</strong>: ' + (taskIndex) + '/10' + '&nbsp;&nbsp;&nbsp;' + '<strong>Attempt</strong>: ' + numAttempts + '/' + maxNumAttempts);
     }
 }
 
@@ -742,6 +745,10 @@ function submitWritten(){
 
     $('#editor_grid_control_btns').hide();
     $('#write_solution').show();
+
+    if (!solved) {
+        $('#write_solution_text').text("Unfortunately, you made three unsuccessful attempts at solving this task. Please describe what you thought the rule to transform the input into the output for this task. When you are done, please press the Submit button to continue.")
+    }
 }
 
 function submitTutorial() {
@@ -827,7 +834,8 @@ function initializeSelectable() {
     }
     toolMode = $('input[name=tool_switching]:checked').val();
     if (toolMode == 'select') {
-        infoMsg('Click and drag to select cells on the grid. Click on another color to change the color of all selected cells, or press C to copy the selected cells to the clipboard');
+        // infoMsg('Click and drag to select cells on the grid. Click on another color to change the color of all selected cells, or press C to copy the selected cells to the clipboard');
+        infoMsg('Switched to Select Tool, click and drag to select cells, then copy by pressing C or change color by clicking new color')
         $('.selectable_grid').selectable(
             {
                 autoRefresh: false,
@@ -854,6 +862,12 @@ function initializeSelectable() {
                 }
             }
         );
+    }
+    else if (toolMode == 'edit') {
+        infoMsg("Switched to Edit Tool");
+    }
+    else if (toolMode == 'floodfill') {
+        infoMsg("Switched to Flood Fill Tool");
     }
 }
 
