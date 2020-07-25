@@ -66,6 +66,11 @@ body {
     margin: 10px;
 }
 
+#evaluation_input {
+    /* display: flex; */
+    justify-content: center;
+}
+
 #evaluation_output_editor {
     float: left;
     width: 530px;
@@ -95,6 +100,11 @@ body {
     display: inline-block;
     align-items: right;
     border-radius: 6px;
+}
+
+#output_grid {
+    display: flex;
+    justify-content: center;
 }
 
 #write_solution {
@@ -153,7 +163,7 @@ body {
 }
 
 #submit_solution_btn:active {
-    background: blue;
+    background: rgb(0, 78, 0);
 }
 
 button:focus {outline:0;}
@@ -170,7 +180,7 @@ button:focus {outline:0;}
 }
 
 #submit_description_btn:active {
-    background: blue;
+    background: rgb(0, 78, 0);
 }
 
 #submit_tutorial_solution_btn {
@@ -184,7 +194,7 @@ button:focus {outline:0;}
 }
 
 #submit_tutorial_solution_btn:active {
-    background: blue;
+    background: rgb(0, 78, 0);
 }
 
 button:focus {outline:0;}
@@ -201,7 +211,7 @@ button:focus {outline:0;}
 }
 
 #submit_tutorial_ description_btn:active {
-    background: blue;
+    background: rgb(0, 78, 0);
 }
 
 
@@ -339,16 +349,21 @@ button:focus {
 .input_preview {
     height: 200px;
     width: 200px;
-    float: center;
-    text-align: center;
+    /* float: center; */
+    /* text-align: center; */
+    /* display: flex; */
+    justify-content: center;
+
 }
 
 .output_preview {
     height: 200px;
     width: 200px;
-    float: center;
+    /* float: center; */
     margin-left: 10px;
     margin-right: 10px;
+    /* display: flex; */
+    justify-content: center;
 }
 
 .preview_block {
@@ -554,4 +569,65 @@ br {
 label_heading {
     font-size: 18px;
     margin-bottom: 5px;
+}
+
+/* help modal */
+/* The Modal (background) */
+#help_modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 2px 16px;
+  background-color: #0074D9;
+  color: white;
+  text-align: center;
+}
+
+/* Modal Body */
+.modal-body {padding: 2px 16px;}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #0074D9;
+  color: white;
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: white;
+  margin: 2% auto; /* 15% from the top and centered */
+  padding: 0;
+  /* border: 1px solid #0074D9; */
+  width: 90%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  /* animation-name: animatetop; */
+  /* animation-duration: 0.4s; */
 }

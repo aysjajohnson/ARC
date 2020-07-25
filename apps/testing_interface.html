@@ -201,7 +201,7 @@
 
           <div id="edition_view">
             <div id="write_solution" style="display: none">
-              <p id="write_solution_text">Please describe your solution to this task using as many words as necessary. Your description will be passed onto another person, who will attempt to solve the same task with only the Test Input provided (and not any of the Example Input and Output pairs). When you are done, please press the Submit button to continue.</p>
+              <p id="write_solution_text">Please describe your solution to this task using as many words as necessary. Your description will be passed onto another person, who will be asked to reproduce the correct answer with only the Test Input and your description provided. When you are done, please press the Submit button to continue.</p>
               <form >
                 <textarea id="write_solution_box"></textarea>
               </form>
@@ -217,7 +217,7 @@
                   <br />
                   <input type="radio" id="tool_edit"
                          name="tool_switching" value="edit" checked>
-                  <label for="tool_edit" class="tool"><strong>Edit</strong>: Modify single cells in the output grid</label>
+                  <label for="tool_edit" class="tool"><strong>Edit</strong>: Modify one cell at a time</label>
                   <br />
                   <input type="radio" id="tool_select"
                          name="tool_switching" value="select">
@@ -225,7 +225,7 @@
                   <br />
                   <input type="radio" id="tool_floodfill"
                          name="tool_switching" value="floodfill">
-                  <label for="tool_floodfill" class="tool"><strong>Flood Fill</strong>: Fill in connected areas of the same color</label>
+                  <label for="tool_floodfill" class="tool"><strong>Flood Fill</strong>: Change connected areas to another color</label>
                   <br />
                 </div>
               </div>
@@ -247,7 +247,6 @@
               
               <div id="resize_control_btns">
                 <label_heading for="edit" id="toolbar_heading">Grid Size</label_heading>
-                <br />
                 <!-- <label for="output_grid_size">Change grid size: </label> -->
                 <label for="height">Height</label>
                 <select id="height">
@@ -303,12 +302,12 @@
                   <option value="24">24</option>
                   <option value="25">25</option>
                 </select>
-                <br /><br />
+                <br />
               </div>
 
               <button onclick="copyFromInput()">Copy from Input</button>
               <button onclick="resetOutputGrid()">Reset Grid</button>
-              <button onclick="solve()">Solve</button>
+              <button onclick="showHelpModal()">Help</button>
               <button onclick="submitTutorial()" id="submit_tutorial_solution_btn">Submit</button>
               <button onclick="submitSolution()" id="submit_solution_btn">Submit</button>
             </div>
@@ -319,7 +318,7 @@
 
     <div id="tutorial_quiz">
       <div class="tutorial_text">
-        <div><strong>Congratulations, you correctly solved the tutorial task! Before you begin the main experiment, we have a few more questions to check your understanding of the task. You will need to answer them all correctly in order to continue.</strong></div>
+        <div><strong>Finall, before you begin the main experiment, we have a few more questions to check your understanding of the task. You will need to answer them all correctly in order to continue.</strong></div>
       </div>
 
       <div class="tutorial_text">
@@ -395,4 +394,33 @@
       </div>
     </div>
   </body>
+
+  <div id="help_modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="close">&times;</span>
+        <h3>ARC Instructions</h3>
+      </div>
+      <div class="modal-body">
+        <p>In this experiment, we are looking at your ability to solve abstract reasoning puzzles. On the left in the <strong>Task Demonstration</strong> panel, there are a limited number of <strong>Example Input</strong> and <strong>Example output</strong> pairs for the current task. Your goal is to determine what the underlying rule is based on these pairs, and apply it to a new <strong>Test Input</strong> to produce the correct <strong>Test Output</strong>. For each task, you will have three attempts to submit your response before moving onto the next task, and there are ten tasks in total. You have as much time as necessary to solve each task.</p>
+        <p>To solve each task, there are a number of different tools you can use:</p>
+        <ul>
+          <li>The <strong>Edit</strong> tool lets you edit each cell one by one by clicking on each cell separately. You can also click and drag your mouse down to edit multiple cells one by one.</li>
+          <li>The <strong>Select</strong> tool lets you edit multiple cells at the same time. Click and drag to select a rectangular block of cells, which will now be shaded. Then you can change the color of all of the selected cells by selecting a different color in the <strong>Select Color</strong> palette. Alternatively, you can <strong>Copy</strong> the cells by first pressing C, and <strong>Paste</strong> the cells in another location by selecting a single cell and pressing V.</li>
+          <li>The <strong>Flood Fill</strong> tool is like a paint bucket, it will fill in any connected cells (of the same color) to the one you click on with the same new color. To use this, first select the color you want using the <strong>Select Color</strong> palette, and click on a single cell with this tool.</li>
+
+        <li>The current color is indicated by the color with an orange border in the <strong>Select Color</strong> palette. Clicking on another color will change the current color.</li>
+          <li>To change the height or width of the <strong>Test Output</strong>, click on their respective dropdown menus to select the new height or width in the <strong>Grid Size</strong> options.</li>
+        </ul>
+        <p>There are a few additional buttons at the bottom that provide additional functionality:</p>
+        <ul>
+          <li>The <strong>Copy from Input</strong> button will copy the current <strong>Test Input</strong> to the <strong>Test Output</strong>.</li>
+          <li>In case you want to start from scratch, the <strong>Reset</strong> button will clear the current <strong>Test Output</strong> grid to a blank 3x3 grid.</li>
+          <li>If you want to read these instructions at a later time, press the <Strong>Help</Strong> button again.</li>
+        </ul>
+        <p>Finally, if you think you have the correct output, press the <strong>Submit</strong> button! You have three attempts to get each task right.</p>
+      </div>      
+    </div>
+  </div>
+</div>  
 </html>

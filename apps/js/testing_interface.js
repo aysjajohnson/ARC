@@ -146,6 +146,33 @@ $(document).ready(function () {
         save(action="change_width");
     });
 
+    // help modal
+    var help_modal = document.getElementById("help_modal");
+    console.log(help_modal)
+     
+    // Get the button that opens the modal
+    // var btn = document.getElementById("myBtn");
+     
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+     
+    // When the user clicks on the button, open the help_modal 
+    // btn.onclick = function() {
+    //   help_modal.style.display = "block";
+    // }
+     
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      help_modal.style.display = "none";
+    }
+     
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == help_modal) {
+        help_modal.style.display = "none";
+      }
+    }
+    
     // hide other elements of the experiment initially
     $('#tutorial_container').hide();
     $('#tutorial_quiz').hide();
@@ -158,11 +185,11 @@ $(document).ready(function () {
 //     "4258a5f9.json", "bdad9b1f.json", "8403a5d5.json", "6e19193c.json", 
 //     "77fdfe62.json", "d037b0a7.json", "93b581b8.json");
 
-var grids = Array("1caeab9d.json","1e0a9b12.json","1f876c06.json","1fad071e.json",
-                  "3af2c5a8.json","6c434453.json","6e82a1ae.json","7c008303.json",
-                  "7fe24cdd.json","8be77c9e.json")
+var grids = Array("1caeab9d.json", "1e0a9b12.json", "1f876c06.json", "1fad071e.json",
+                  "3af2c5a8.json", "6c434453.json", "6e82a1ae.json", "7c008303.json",
+                  "99b1bc43.json", "f9012d9b.json")
 
-var tutorial_grid = Array("00d62c1b.json")
+var tutorial_grid = Array("bdad9b1f.json")
 
 var taskList = new Array();
 var tutorialTask = new Array();
@@ -178,8 +205,8 @@ var IS_TUTORIAL = true;
 var WRITTEN_SOLUTION = "";
 
 // Cosmetic.
-var EDITION_GRID_HEIGHT = 530;
-var EDITION_GRID_WIDTH = 530;
+var EDITION_GRID_HEIGHT = 400;
+var EDITION_GRID_WIDTH = 400;
 var MAX_CELL_SIZE = 100;
 
 // shuffle function from stack overflow
@@ -341,14 +368,19 @@ function setUpEditionGridListeners(jqGrid) {
 
     // set up toggle to allow for draggable edit mode
     var isToggle = false;
-    
+
+    // turn draggable mode on when mouse is held down on an output cell
     jqGrid.find(".cell").mousedown(function(event) {
         isToggle = true;
     });
 
-    jqGrid.find(".cell").mouseup(function(event) {
-        isToggle = false;
-    });
+    // turn draggable mode off when mouse up is performed (even outside of the grid)
+    window.addEventListener('mouseup', function(event){
+        if (isToggle) {
+            console.log('turned off isToggle');
+            isToggle = false;
+        }
+    })
 
     jqGrid.find(".cell").mousemove(function(event) {
         mode = $("input[name=tool_switching]:checked").val();
@@ -452,7 +484,7 @@ function solve() {
     else {
         $('#submit_solution_btn').click();
         $('#write_solution_box').val("test");
-        // $('#submit_description_btn').click();
+        $('#submit_description_btn').click();
     }
 }
 
@@ -660,20 +692,6 @@ function startExperiment() {
     loadNextTask();
     resetEditor();
 
-    // TODO: figure this out based on interaction with tutorial stuff
-    // document.getElementById("submit_solution_btn").setAttribute( "onClick", "javascript: submitSolution();" );
-    // document.getElementById("submit_description_btn").setAttribute( "onClick", "javascript: nextTask();" );
-    // document.getElementById("submit_description_btn").innerHTML = "Submit";
-    // document.getElementById('tutorial_bg').style.display = 'block';
-    // document.getElementById('tutorial_demonstration').style.display = 'none';
-    // document.getElementById('tutorial_quiz').style.display = 'none';
-    // document.getElementById("random_task_btn").style.visibility = "hidden";
-    // document.getElementById('workspace').style.display = 'block;'
-
-    // document.getElementById('write_solution_box').value = " ";
-    // document.getElementById('write_solution').style.display = 'none';
-    // document.getElementById('submit_solution_btn').style.display = 'block';
-    // document.getElementById('editor_grid_control_btns').style.display = 'block';
     window.numAttempts = 1;
 }
 
@@ -749,6 +767,10 @@ function submitWritten(){
     if (!solved) {
         $('#write_solution_text').text("Unfortunately, you made three unsuccessful attempts at solving this task. Please describe what you thought the rule to transform the input into the output for this task. When you are done, please press the Submit button to continue.")
     }
+    else if (IS_TUTORIAL) {
+        $('#write_solution_text').text("Congratulations, you solved the tutorial task! In the main experiment, after either solving the task, or three incorrect attempts you will be asked to write a description of your solution in the text box below. Please write out a description for the tutorial task you just completed, and when you are done, please press the Submit button to continue.")
+
+    }
 }
 
 function submitTutorial() {
@@ -769,6 +791,7 @@ function submitTutorial() {
     }
 
     infoMsg('Your response was correct!')
+    solved = true;
     save(action="submit_tutorial")
     submitWritten();
 }
@@ -936,6 +959,15 @@ function startTutorialTask() {
                   var task = tasks[tutorialTask[0][1]];
                   verify(task);
               });
+}
+
+
+function showHelpModal() {
+    help_modal.style.display = "block";
+}
+
+function hideHelpModal() {
+    help_modal.style.display = "none"
 }
 
 // original code that is no longer needed
