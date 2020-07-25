@@ -709,16 +709,26 @@ function nextTask() {
             // show final page if participant has finished all tasks
             console.log(taskIndex);
             if (taskIndex == 10) {
-                console.log('finishing experiment!');
-                // TODO: convert this to a function
-                $('#workspace').hide();
-                $('#experiment_finish').show();
+                finishExperiment();
             }
             else {
                 loadNextTask();
             }
         }
     })   
+}
+
+function finishExperiment() {
+    $('#modal_bg').hide();
+    $('#tutorial_container').hide();
+    $('#tutorial_nav').hide();
+    $('#workspace').hide();
+    $('#experiment_finish').show();
+}
+
+function submitResults() {
+    // TODO: save feedback provided
+    // TODO: submit results to Mechanical Turk
 }
 
 function verify(task) {

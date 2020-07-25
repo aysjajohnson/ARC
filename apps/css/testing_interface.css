@@ -129,11 +129,25 @@ body {
     padding: 5px;
     box-sizing: border-box;
     border: 2px solid #ccc;
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: #f8f8f8;
     font-size: 16px;
     resize: none;
 }
+
+#feedback_box {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial; 
+    font-size: 18px;
+    width: 90%;
+    height: 150px;
+    padding: 5px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    resize: none;
+}
+
 
 #editor_grid_control_btns {
     float: left;

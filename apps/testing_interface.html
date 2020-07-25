@@ -390,7 +390,14 @@
 
     <div id="experiment_finish">
       <div class="tutorial_text">
-        <div><strong>Congratulations, you have completed the experiment!</strong></div>
+        <div>Congratulations, you have completed the experiment! If you have any additional feedback or comments, please leave them in the box below. Otherwise, click the <strong>Submit</strong> button to finish the HIT and submit your results to us.</div>
+        <br />
+        <form >
+          <textarea id="feedback_box"></textarea>
+        </form>
+        <br />
+        <button onclick="submitResults()" id="submit_feedback_btn">Submit</button>
+        
       </div>
     </div>
   </body>
@@ -399,7 +406,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <span class="close">&times;</span>
-        <h3>ARC Instructions</h3>
+        <h3>Help</h3>
       </div>
       <div class="modal-body">
         <p>In this experiment, we are looking at your ability to solve abstract reasoning puzzles. On the left in the <strong>Task Demonstration</strong> panel, there are a limited number of <strong>Example Input</strong> and <strong>Example output</strong> pairs for the current task. Your goal is to determine what the underlying rule is based on these pairs, and apply it to a new <strong>Test Input</strong> to produce the correct <strong>Test Output</strong>. For each task, you will have three attempts to submit your response before moving onto the next task, and there are ten tasks in total. You have as much time as necessary to solve each task.</p>
