@@ -67,8 +67,10 @@ body {
 }
 
 #evaluation_input {
-    /* display: flex; */
-    justify-content: center;
+    display: flex;
+    justify-content: top;
+    align-items: center;
+    flex-direction: column;    
 }
 
 #evaluation_output_editor {
@@ -363,11 +365,10 @@ button:focus {
 .input_preview {
     height: 200px;
     width: 200px;
-    /* float: center; */
-    /* text-align: center; */
-    /* display: flex; */
-    justify-content: center;
-
+    display: flex;
+    justify-content: top;
+    align-items: center;
+    flex-direction: column;
 }
 
 .output_preview {
@@ -376,8 +377,10 @@ button:focus {
     /* float: center; */
     margin-left: 10px;
     margin-right: 10px;
-    /* display: flex; */
-    justify-content: center;
+    display: flex;
+    justify-content: top;
+    align-items: center;
+    flex-direction: column;    
 }
 
 .preview_block {
