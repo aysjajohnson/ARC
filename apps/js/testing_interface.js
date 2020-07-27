@@ -59,8 +59,8 @@ $(document).ready(function () {
 
     $('input[type=radio][name=tool_switching]').change(function() {
         toolMode = $('input[name=tool_switching]:checked').val();
-        save(action="change_tool")
         initializeSelectable();
+        save(action="change_tool");
     });
 
     $('body').keydown(function(event) {
@@ -128,7 +128,7 @@ $(document).ready(function () {
                 }
 
                 infoMsg("Successfully pasted cells from clipboard!")
-                save(action="select_paste")
+                save(action="select_paste", action_x=targetx, action_y=targety)
             } else {
                 errorMsg('Can only paste at a specific location; only select *one* cell as paste destination.');
             }
@@ -246,7 +246,7 @@ var toolBar = document.getElementById("editor_grid_control_btns");
 
 // save function
 save_data = new Array();
-function save(action) {
+function save(action, action_x="", action_y="", select_loc="") {
     window.numActions ++;
 
     // get current date and time
@@ -254,12 +254,17 @@ function save(action) {
 
     // create object to store info
     save_list = {action: action,
+                 action_x: action_x,
+                 action_y: action_y,
                  num_actions: numActions,
                  test_output_grid: outputToString(),
                  test_output_size: getOutputSize(),
+                 test_input_grid: inputToString(),
+                 test_input_size: getInputSize(),
                  selected_tool: getSelectedTool(),
                  selected_symbol: getSelectedSymbol(),
                  selected_data: SELECT_DATA,
+                 select_loc: select_loc,
                  copy_paste_data: COPY_PASTE_DATA,
                  task_number: taskIndex,
                  task_name: taskName,
@@ -290,11 +295,34 @@ function getOutputSize() {
     return Array(height, width);
 }
 
+function getInputSize() {
+    height = CURRENT_INPUT_GRID.height;
+    width = CURRENT_INPUT_GRID.width;
+    return Array(height, width);
+}
+
 // converting output grid to string
 function outputToString(){
     syncFromEditionGridToDataGrid();
     var stringGrid = "|";
     var dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
+    for (var i = 0; i < dataGrid.length; i++) {
+        if (i == dataGrid.length - 1) {
+            stringGrid = stringGrid.concat(dataGrid[i].join(""))
+        }
+        else {
+            stringGrid = stringGrid.concat(dataGrid[i].join(""));
+            stringGrid = stringGrid.concat("|");
+        }
+    }
+    stringGrid = stringGrid.concat("|");
+    
+    return stringGrid;
+}
+
+function inputToString(){
+    var stringGrid = "|";
+    var dataGrid = JSON.parse(JSON.stringify(CURRENT_INPUT_GRID.grid));
     for (var i = 0; i < dataGrid.length; i++) {
         if (i == dataGrid.length - 1) {
             stringGrid = stringGrid.concat(dataGrid[i].join(""))
@@ -358,11 +386,14 @@ function setUpEditionGridListeners(jqGrid) {
             grid = CURRENT_OUTPUT_GRID.grid;
             floodfillFromLocation(grid, cell.attr("x"), cell.attr("y"), symbol);
             syncFromDataGridToEditionGrid();
-            save(action="floodfill");
+            save(action="floodfill", action_x=cell.attr("x"), action_y=cell.attr("y"));
         }
         else if (mode == "edit") {
-            setCellSymbol(cell, symbol);
-            save(action="edit");
+            if (cell.attr("symbol") != symbol) {
+                // only set cell if its not already that color
+                setCellSymbol(cell, symbol);
+                save(action="edit", action_x=cell.attr("x"), action_y=cell.attr("y"));
+            }
         }
     });
 
@@ -371,13 +402,16 @@ function setUpEditionGridListeners(jqGrid) {
 
     // turn draggable mode on when mouse is held down on an output cell
     jqGrid.find(".cell").mousedown(function(event) {
-        isToggle = true;
+        mode = $("input[name=tool_switching]:checked").val();
+        if (mode == "edit") {
+            isToggle = true;
+        }
     });
 
     // turn draggable mode off when mouse up is performed (even outside of the grid)
     window.addEventListener('mouseup', function(event){
-        if (isToggle) {
-            console.log('turned off isToggle');
+        mode = $("input[name=tool_switching]:checked").val();
+        if (isToggle && mode == "edit") {
             isToggle = false;
         }
     })
@@ -389,9 +423,9 @@ function setUpEditionGridListeners(jqGrid) {
             cell = $(event.target);
             symbol = getSelectedSymbol();
 
-            if (cell.attr('symbol') != symbol) {
+            if (cell.attr("symbol") != symbol) {
                 setCellSymbol(cell, symbol);
-                save(action="edit");
+                save(action="edit", action_x=cell.attr("x"), action_y=cell.attr("y"));
             }
         }
     });
@@ -406,6 +440,8 @@ function resizeOutputGrid() {
     dataGrid = JSON.parse(JSON.stringify(CURRENT_OUTPUT_GRID.grid));
     CURRENT_OUTPUT_GRID = new Grid(height, width, dataGrid);
     refreshEditionGrid(jqGrid, CURRENT_OUTPUT_GRID);
+
+    SELECT_DATA = [];
 }
 
 function resetColorBlack() {
@@ -438,8 +474,9 @@ function resetOutputGrid() {
     // set initial tool to be edit
     document.getElementById("tool_edit").checked = true;
 
-    // clear clipboard
+    // clear clipboard and selected data
     COPY_PASTE_DATA = [];
+    SELECT_DATA = [];
 
     infoMsg("Resetting Test Output grid")
     save(action="reset_grid")
@@ -456,6 +493,9 @@ function copyFromInput() {
     // modify grid size values
     $('#height').val(CURRENT_OUTPUT_GRID.height);
     $('#width').val(CURRENT_OUTPUT_GRID.width);
+
+    // clear selected data
+    SELECT_DATA = [];
 
     infoMsg("Copied Test Input grid to Test Output")
     save(action="copy_from_input")
@@ -788,6 +828,13 @@ function submitTutorial() {
     reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
     submitted_output = CURRENT_OUTPUT_GRID.grid;
 
+    // clear any selected cells
+    $('.ui-selected').each(function(i, e) {
+        $(e).removeClass('ui-selected');
+    });
+
+    SELECT_DATA = [];
+    
     for (var i = 0; i < reference_output.length; i++) {
         ref_row = reference_output[i];
         for (var j = 0; j < ref_row.length; j++){
@@ -811,6 +858,13 @@ function submitSolution() {
     syncFromEditionGridToDataGrid();
     reference_output = TEST_PAIRS[CURRENT_TEST_PAIR_INDEX]['output'];
     submitted_output = CURRENT_OUTPUT_GRID.grid;
+
+    // clear any selected cells
+    $('.ui-selected').each(function(i, e) {
+        $(e).removeClass('ui-selected');
+    });
+
+    SELECT_DATA = [];
 
     for (var i = 0; i < reference_output.length; i++) {
         ref_row = reference_output[i];
@@ -880,9 +934,16 @@ function initializeSelectable() {
                 },
                 stop: function(event, ui) {
                     // log data that is selected
-                    // TODO: figure out how to determine if test input or test output is selected
-                    
+                    var select_loc = ""
                     selected = $('.ui-selected');
+
+                    // check if selected is from test input or test output
+                    if (selected.parent().parent().parent().attr('id') == 'evaluation-input-view') {
+                        select_loc = "test_input"
+                    }
+                    else if (selected.parent().parent().parent().attr('id') == "output_grid") {
+                        select_loc = "test_output"
+                    }
                     
                     SELECT_DATA = [];
                     for (var i = 0; i < selected.length; i ++) {
@@ -891,16 +952,21 @@ function initializeSelectable() {
                         SELECT_DATA.push([x, y]);
                     }
                     
-                    save(action="select_cells");
+                    save(action="select_cells",
+                         action_x=$(selected[0]).attr('x'),
+                         action_y=$(selected[0]).attr('y'),
+                         select_loc=select_loc);
                 }
             }
         );
     }
     else if (toolMode == 'edit') {
         infoMsg("Switched to Edit Tool");
+        SELECT_DATA = [];
     }
     else if (toolMode == 'floodfill') {
         infoMsg("Switched to Flood Fill Tool");
+        SELECT_DATA = [];
     }
 }
 
