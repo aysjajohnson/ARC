@@ -175,6 +175,7 @@ $(document).ready(function () {
     
     // hide other elements of the experiment initially
     $('#tutorial_container').hide();
+    $('#tutorial_nav').hide();
     $('#tutorial_quiz').hide();
     $('#workspace').hide();
     $('#experiment_finish').hide();
@@ -723,12 +724,6 @@ function startExperiment() {
     $('#workspace').show();
     $('#evaluation-input-view').show();
 
-    if (IS_TUTORIAL) {
-        // this occurs when skipping straight to main
-
-
-    }
-
     loadNextTask();
     resetEditor();
 
@@ -971,7 +966,7 @@ function initializeSelectable() {
 }
 
 // tutorial slideshow code
-var slideIndex = 1;
+var slideIndex = 0;
 
 // next/previous controls
 function plusSlides(n) {
@@ -986,6 +981,7 @@ function currentSlide(n) {
 function showSlides() {
     $('#modal_bg').hide();
     $('#tutorial_container').show();
+    $('#tutorial_nav').show();
     
     var i;
     var n = slideIndex;
@@ -993,10 +989,10 @@ function showSlides() {
     var slides = $('.tutorial_slide');
     var dots = $('.dot');
 
-    if (n < 1) {
-        slideIndex = 1 // prevent going past the first slide
+    if (n < 0) {
+        slideIndex = 0 // prevent going past the first slide
     }
-    else if (n >= 1 && n <= slides.length) {
+    else if (n >= 0 && n < slides.length) {
         // update active slide
         for (i = 0; i < slides.length; i++) {
             slides[i].style.display = "none"; 
@@ -1006,10 +1002,10 @@ function showSlides() {
             dots[i].className = dots[i].className.replace(" active", "");
         }
 
-        slides[slideIndex-1].style.display = "block"; 
-        dots[slideIndex-1].className += " active";
+        slides[slideIndex].style.display = "block"; 
+        dots[slideIndex].className += " active";
     }
-    else if (n > slides.length) {
+    else if (n >= slides.length) {
         // hide slides and start tutorial task
         for (i = 0; i < slides.length; i++) {
             slides[i].style.display = "none"; 

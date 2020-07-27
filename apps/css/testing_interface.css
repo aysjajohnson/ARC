@@ -23,7 +23,7 @@ body {
     background-color: white;
     overflow: hidden;
     positive: relative;
-    margin: auto;
+    /* margin: auto; */
     /* margin-left: auto; */
     /* margin-right: auto; */
     /* display: block; */
@@ -111,7 +111,7 @@ body {
 
 #write_solution {
     font-size: 18px;
-    text-align: justify;
+    /* text-align: justify; */
     text-justify: auto;
     float: left;
     margin-top: 10px;
@@ -449,16 +449,16 @@ button:focus {
 
 .tutorial_pair{
     text-align: center;
+    padding-top: 20px;
 }
 
 .tutorial_slide {
     margin: auto;
     background-color: white;
-    text-align: center;
-    vertical-align: top;
+    /* text-align: center; */
     width: 1000px;
-    height: 700px;
-    margin-top: 10px;
+    /* height: 500px; */
+    margin-top: 20px;
 }
 
 .tutorial_text {
@@ -475,8 +475,7 @@ button:focus {
     background-color: white;
     text-align: center;
     vertical-align: top;
-    /*    width: 500px;*/
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 #modal_bg {
@@ -544,7 +543,7 @@ br {
     font-weight: bold;
     font-size: 18px;
     transition: 0.6s ease;
-    border-radius: 0 3px 3px 0;
+    /* border-radius: 0 3px 3px 0; */
     user-select: none;
 }
 
@@ -560,7 +559,10 @@ br {
 }
 
 #tutorial_nav {
-    bottom: 0;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    padding-bottom: 20px;
 }
 
 /* The dots/bullets/indicators */

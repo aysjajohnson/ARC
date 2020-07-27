@@ -30,9 +30,9 @@
     </div>
     <div id="tutorial_container">
       <div class="tutorial_slide">
-        <!-- <div><strong>ARC Tutorial</strong><br /><br /></div> -->
+        <div><strong>ARC Tutorial</strong> (1/10)<br /><br /></div>
         <div> In this experiment you will see several input and output pairs, like the ones below. Each output is some transformation of the input. You can think of it like a computer program applying to the input to produce the output. <br /> </div>
-        <br /><br />
+
         <div class="tutorial_pair">
           <img src="img/input1.png" width="200" height="200">
           <div id="computer_arrow">
@@ -45,7 +45,7 @@
           </div>
           <img src='img/output1.png' width="200" height="200">
         </div>
-        <br /><br />
+
         <div class="tutorial_pair">
           <img src="img/input2.png" width="200" height="200">
           <div id="computer_arrow">
@@ -59,12 +59,11 @@
           <img src='img/output2.png' width="200" height="200">
         </div>
       </div>
-      <br><br>
 
       <div class="tutorial_slide">
-        <!-- <div><strong>ARC Tutorial</strong><br /><br /></div> -->
+        <div><strong>ARC Tutorial</strong> (2/10)<br /><br /></div>
         <div> You will then see a test input and blank output. You should fill in the test output with your best guess at the program that completes the pattern. We will explain how to do this below. <br /> </div>
-        <br /><br>
+
         <div class="tutorial_pair">
           <img src="img/test.png" width="200" height="200">
           <div id="computer_arrow">
@@ -80,8 +79,8 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (3/10)<br /><br /></div>
         <div> In this case the correct program was one that fills in all connected green areas with yellow. So the correct output would be: <br /> </div>
-        <br /><br>
 
         <div class="tutorial_pair">
           <img src="img/test_correct.png" width="200" height="200">
@@ -89,8 +88,8 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (4/10)<br /><br /></div>
         <div> Below is the interface you will be using. We will provide some videos on how to use each feature of the interface. <br /> </div>
-        <br /><br>
 
         <div class="tutorial_pair">
           <img src="img/interface.png" width="1000" height="600">
@@ -98,6 +97,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (5/10)<br /><br /></div>
         <div> The videos below will demonstrate the basic functionality of each of the tools in the interface. <br> <br> The video below demonstrates how to <strong> change the size of the grid </strong> and how to <strong> reset it back to it's original shape.</strong> It will always start as a 3x3 blank grid. <br /> </div>
 
         <div class="tutorial_video">
@@ -106,6 +106,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (6/10)<br /><br /></div>
         <div> The video below demonstrates how to <strong> copy the input image </strong> and how to use the <strong> edit tool.</strong> When editing, you can modify single cells in the output grid. <br /> </div>
 
         <div class="tutorial_video">
@@ -114,6 +115,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (7/10)<br /><br /></div>
         <div> The video below demonstrates how to use the <strong> select and flood fill tools.</strong> Using select will allow you to highlight sections of the grid to fill in with a specific color. The flood fill tool will fill in connected areas with the color you choose. <br /> </div>
         <div class="tutorial_video">
           <img src="img/select-flood-fill.gif" />
@@ -121,6 +123,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (8/10)<br /><br /></div>
         <div> The video below demonstrates how to <strong> copy and paste </strong>patterns from the input grid to the output grid. To do so you would first select the select tool, then highlight the portion of the input grid you're interested in, copy it with ctrl + c, and then paste it onto the output grid with ctrl + v. <br /> </div>
         <div class="tutorial_video">
           <img src="img/ctrl-c.gif" />
@@ -128,6 +131,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (9/10)<br /><br /></div>
         <div> The video below demonstrates how to do the <strong> writing portion of the experiment.</strong> Once you submit either the correct answer or three incorrect answers, you will be asked to submit a short written description of your best guess at the rule that transforms the inputs to the outputs. You will then move onto the next task. <br> <br> There are ten tasks in total. You can view which task you are on and how many attempts you have used in the top bar. This area will also display whether or not your solution is correct. <br /> </div>
         <div class="tutorial_video">
           <img src="img/submit-solution.gif" />
@@ -135,6 +139,7 @@
       </div>
 
       <div class="tutorial_slide">
+        <div><strong>ARC Tutorial</strong> (10/10)<br /><br /></div>
         <div> Now that you have the tools necessary, please complete the task below. You will only be able to move onto the next stage if you do it correctly. For the tutorial task, you can try as many times as you need, however during the main experiment you will only have three attempts per task. Additionally, there is no time limit for each task.<br /> </div>
         <br />
       </div>
@@ -144,16 +149,16 @@
     </div>
 
     <div id="tutorial_nav" style="text-align:center">
+      <span class="dot" onclick="currentSlide(0)"></span> 
       <span class="dot" onclick="currentSlide(1)"></span> 
-      <span class="dot" onclick="currentSlide(2)"></span> 
-      <span class="dot" onclick="currentSlide(3)"></span>
+      <span class="dot" onclick="currentSlide(2)"></span>
+      <span class="dot" onclick="currentSlide(3)"></span> 
       <span class="dot" onclick="currentSlide(4)"></span> 
       <span class="dot" onclick="currentSlide(5)"></span> 
       <span class="dot" onclick="currentSlide(6)"></span> 
       <span class="dot" onclick="currentSlide(7)"></span> 
       <span class="dot" onclick="currentSlide(8)"></span> 
-      <span class="dot" onclick="currentSlide(9)"></span> 
-      <span class="dot" onclick="currentSlide(10)"></span>       
+      <span class="dot" onclick="currentSlide(9)"></span>       
     </div>    
 
     <div id="workspace">
@@ -318,7 +323,7 @@
 
     <div id="tutorial_quiz">
       <div class="tutorial_text">
-        <div><strong>Finall, before you begin the main experiment, we have a few more questions to check your understanding of the task. You will need to answer them all correctly in order to continue.</strong></div>
+        <div><strong>Finally, before you begin the main experiment, we have a few more questions to check your understanding of the task. You will need to answer them all correctly in order to continue.</strong></div>
       </div>
 
       <div class="tutorial_text">
