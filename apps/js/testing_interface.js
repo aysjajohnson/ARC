@@ -179,6 +179,9 @@ $(document).ready(function () {
     $('#tutorial_quiz').hide();
     $('#workspace').hide();
     $('#experiment_finish').hide();
+
+    // start tutorial
+    showSlides();
 });
 
 // Experiment grids
@@ -592,7 +595,9 @@ function loadJSONTask(train, test) {
 
 function loadNextTask() {
     // reset boolean tracking whether task is solved
+    window.numAttempts = 1;
     solved = false;
+    WRITTEN_SOLUTION = "";
 
     // load next task
     var subset = "training";
@@ -648,7 +653,7 @@ function finishTutorial() {
         else {
             save(action="write_tutorial_description");
             resetEditor();
-            window.numAttempts = 1;
+            // window.numAttempts = 1;
             tutorialQuiz();
         }
     });
@@ -726,8 +731,6 @@ function startExperiment() {
 
     loadNextTask();
     resetEditor();
-
-    window.numAttempts = 1;
 }
 
 function nextTask() {
@@ -809,12 +812,15 @@ function submitWritten(){
     $('#editor_grid_control_btns').hide();
     $('#write_solution').show();
 
-    if (!solved) {
-        $('#write_solution_text').text("Unfortunately, you made three unsuccessful attempts at solving this task. Please describe what you thought the rule to transform the input into the output for this task. When you are done, please press the Submit button to continue.")
-    }
-    else if (IS_TUTORIAL) {
+    if (IS_TUTORIAL) {
+        // tutorial only gets here if solved
         $('#write_solution_text').text("Congratulations, you solved the tutorial task! In the main experiment, after either solving the task, or three incorrect attempts you will be asked to write a description of your solution in the text box below. Please write out a description for the tutorial task you just completed, and when you are done, please press the Submit button to continue.")
-
+    }
+    else if (solved) {
+        $('#write_solution_text').text("You correctly solved this task! Please describe your solution to this task using as many words as necessary. Your description will be passed onto another person, who will be asked to reproduce the correct answer with only the Test Input and your description provided, so make sure to provide enough detail in your response. When you are done, please press the Submit button to continue.")
+    }
+    else if (!solved) {
+        $('#write_solution_text').text("Unfortunately, you made three unsuccessful attempts at solving this task. Please describe what you thought the rule to transform the input into the output for this task. When you are done, please press the Submit button to continue.")
     }
 }
 
@@ -869,7 +875,6 @@ function submitSolution() {
                 window.numAttempts ++;
                 console.log(numAttempts);
                 if (numAttempts > maxNumAttempts) {
-                    // TODO: figure out whether or not to skip submitWritten
                     errorMsg('You made three errors, you will move on to the next task');
                     submitWritten();
                 }
@@ -886,7 +891,6 @@ function submitSolution() {
     solved = true;
     save(action="submit")
     submitWritten();
-    // }
 }
 
 function nextTestInput() {
@@ -980,6 +984,7 @@ function currentSlide(n) {
 
 function showSlides() {
     $('#modal_bg').hide();
+    $('#modal').hide();
     $('#tutorial_container').show();
     $('#tutorial_nav').show();
     
